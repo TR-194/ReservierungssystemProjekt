@@ -19,3 +19,7 @@ buildNumber.properties
 .classpath
 .settings
 target/
+
+.nx/installation
+.nx/cache
+.nx/workspace-data
