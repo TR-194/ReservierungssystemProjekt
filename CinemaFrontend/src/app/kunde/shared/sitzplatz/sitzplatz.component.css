@@ -1,0 +1,16 @@
+.sitzplan {
+    display: grid;
+    grid-template-columns: repeat(10, 40px);
+    gap: 5px;
+  }
+  .frei {
+    background-color: green;
+    cursor: pointer;
+  }
+  .reserviert {
+    background-color: orange;
+  }
+  .gebucht {
+    background-color: red;
+  }
+  

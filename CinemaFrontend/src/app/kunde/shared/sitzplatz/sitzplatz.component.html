@@ -1,1 +1,10 @@
-<p>sitzplatz works!</p>
+<div class="sitzplan">
+    <div *ngFor="let sitzplatz of sitzplaetze" 
+         [class.frei]="sitzplatz.status === 'frei'"
+         [class.reserviert]="sitzplatz.status === 'reserviert'"
+         [class.gebucht]="sitzplatz.status === 'gebucht'"
+         (click)="waehleSitzplatz(sitzplatz)">
+      {{ sitzplatz.reihe }}-{{ sitzplatz.nummer }}
+    </div>
+  </div>
+  

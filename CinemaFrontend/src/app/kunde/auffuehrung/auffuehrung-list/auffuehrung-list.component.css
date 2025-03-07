@@ -1,0 +1,21 @@
+.container {
+    max-width: 800px;
+    margin: auto;
+  }
+  
+  ul {
+    list-style: none;
+    padding: 0;
+  
+    li {
+      padding: 10px;
+      border: 1px solid #ccc;
+      margin: 5px 0;
+      cursor: pointer;
+      transition: background 0.3s;
+  
+      &:hover {
+        background: #f0f0f0;
+      }
+    }
+  }

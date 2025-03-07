@@ -1,1 +1,6 @@
-<p>auffuehrung-detail works!</p>
+<div *ngIf="auffuehrung">
+  <h2>{{ auffuehrung.film.titel }}</h2>
+  <p>Datum: {{ auffuehrung.datum }}</p>
+  <p>Uhrzeit: {{ auffuehrung.uhrzeit }}</p>
+  <p>Saal: {{ auffuehrung.saal.name }}</p>
+</div>

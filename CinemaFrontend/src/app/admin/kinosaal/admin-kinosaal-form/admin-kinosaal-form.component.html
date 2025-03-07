@@ -1,1 +1,12 @@
-<p>admin-kinosaal-form works!</p>
+<div class="kinosaal-form">
+  <h2>Kinosaal erstellen</h2>
+  <label>
+    Name:
+    <input type="text" [(ngModel)]="name">
+  </label>
+  <label>
+    Freigegeben:
+    <input type="checkbox" [(ngModel)]="freigegeben">
+  </label>
+  <button (click)="speichereKinosaal()">Speichern</button>
+</div>

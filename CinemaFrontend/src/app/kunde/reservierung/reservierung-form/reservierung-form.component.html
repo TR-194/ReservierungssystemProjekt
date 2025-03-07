@@ -1,1 +1,12 @@
-<p>reservierung-form works!</p>
+<form [formGroup]="reservierungForm" (ngSubmit)="onSubmit()">
+    <label for="name">Name:</label>
+    <input id="name" formControlName="name" required />
+  
+    <label for="email">E-Mail:</label>
+    <input id="email" formControlName="email" type="email" required />
+  
+    <label for="sitzplaetze">Sitzplätze:</label>
+    <input id="sitzplaetze" formControlName="sitzplaetze" required />
+  
+    <button type="submit" [disabled]="reservierungForm.invalid">Reservieren</button>
+  </form>

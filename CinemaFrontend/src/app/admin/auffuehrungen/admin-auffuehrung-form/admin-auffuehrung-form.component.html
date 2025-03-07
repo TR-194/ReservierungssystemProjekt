@@ -1,1 +1,16 @@
-<p>admin-auffuehrung-form works!</p>
+<h2>Neue Aufführung hinzufügen</h2>
+<form (ngSubmit)="submitForm()">
+  <label for="film">Film:</label>
+  <input id="film" type="text" [(ngModel)]="auffuehrung.film" name="film" required />
+
+  <label for="datum">Datum:</label>
+  <input id="datum" type="date" [(ngModel)]="auffuehrung.datum" name="datum" required />
+
+  <label for="uhrzeit">Uhrzeit:</label>
+  <input id="uhrzeit" type="time" [(ngModel)]="auffuehrung.uhrzeit" name="uhrzeit" required />
+
+  <label for="saal">Saal:</label>
+  <input id="saal" type="text" [(ngModel)]="auffuehrung.saal" name="saal" required />
+
+  <button type="submit">Speichern</button>
+</form>

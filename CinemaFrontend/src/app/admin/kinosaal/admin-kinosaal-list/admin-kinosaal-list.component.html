@@ -1,1 +1,9 @@
-<p>admin-kinosaal-list works!</p>
+<div class="kinosaal-list">
+  <h2>Kinosäle</h2>
+  <ul>
+    <li *ngFor="let saal of kinosäle">
+      {{ saal.name }} - {{ saal.freigegeben ? 'Freigegeben' : 'Nicht freigegeben' }}
+    </li>
+  </ul>
+  <button (click)="erstelleNeuenKinosaal()">Neuen Kinosaal hinzufügen</button>
+</div>

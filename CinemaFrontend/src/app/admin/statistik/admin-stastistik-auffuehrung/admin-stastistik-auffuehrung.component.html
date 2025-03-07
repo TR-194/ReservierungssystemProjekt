@@ -1,1 +1,11 @@
-<p>admin-stastistik-auffuehrung works!</p>
+<h2>Einnahmen pro Aufführung</h2>
+<table>
+  <tr>
+    <th>Aufführung</th>
+    <th>Einnahmen (€)</th>
+  </tr>
+  <tr *ngFor="let auffuehrung of auffuehrungenStatistik">
+    <td>{{ auffuehrung.name }}</td>
+    <td>{{ auffuehrung.einnahmen | currency:'EUR' }}</td>
+  </tr>
+</table>

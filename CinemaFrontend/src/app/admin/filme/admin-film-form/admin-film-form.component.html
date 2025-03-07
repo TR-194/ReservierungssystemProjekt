@@ -1,1 +1,16 @@
-<p>admin-film-form works!</p>
+<div class="film-form">
+  <h2>{{ filmId ? 'Film bearbeiten' : 'Neuen Film hinzufügen' }}</h2>
+  <label>
+    Titel:
+    <input type="text" [(ngModel)]="film.titel">
+  </label>
+  <label>
+    Genre:
+    <input type="text" [(ngModel)]="film.genre">
+  </label>
+  <label>
+    Dauer (Minuten):
+    <input type="number" [(ngModel)]="film.dauer">
+  </label>
+  <button (click)="speichereFilm()">Speichern</button>
+</div>

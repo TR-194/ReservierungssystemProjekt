@@ -1,1 +1,20 @@
-<p>admin-auffuehrung-list works!</p>
+<h2>Aufführungen verwalten</h2>
+<a routerLink="/admin/auffuehrungen/neu">Neue Aufführung hinzufügen</a>
+<table>
+  <tr>
+    <th>Film</th>
+    <th>Datum</th>
+    <th>Uhrzeit</th>
+    <th>Saal</th>
+    <th>Aktionen</th>
+  </tr>
+  <tr *ngFor="let auffuehrung of auffuehrungen">
+    <td>{{ auffuehrung.film }}</td>
+    <td>{{ auffuehrung.datum }}</td>
+    <td>{{ auffuehrung.uhrzeit }}</td>
+    <td>{{ auffuehrung.saal }}</td>
+    <td>
+      <button (click)="deleteAuffuehrung(auffuehrung.id)">Löschen</button>
+    </td>
+  </tr>
+</table>
