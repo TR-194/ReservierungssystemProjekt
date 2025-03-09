@@ -3,7 +3,9 @@
          [class.frei]="sitzplatz.status === 'frei'"
          [class.reserviert]="sitzplatz.status === 'reserviert'"
          [class.gebucht]="sitzplatz.status === 'gebucht'"
-         (click)="waehleSitzplatz(sitzplatz)">
+         (click)="waehleSitzplatz(sitzplatz)"
+         (keydown.enter)="waehleSitzplatz(sitzplatz)"
+         tabindex="0">
       {{ sitzplatz.reihe }}-{{ sitzplatz.nummer }}
     </div>
   </div>

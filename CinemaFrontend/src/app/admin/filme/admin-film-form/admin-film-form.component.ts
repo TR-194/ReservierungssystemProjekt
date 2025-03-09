@@ -14,7 +14,7 @@ import { ActivatedRoute, Router } from '@angular/router';
   templateUrl: './admin-film-form.component.html',
   styleUrls: ['./admin-film-form.component.css']
 })
-export class AdminFilmFormComponent {
+export class AdminFilmFormComponent implements OnInit {
   film: Film = { id: 0, titel: '', genre: '', dauer: 0 };
   filmId?: number;
 

@@ -5,8 +5,6 @@ import { ReservierungService } from 'src/app/shared/services/reservierung.servic
 import { BuchungService } from 'src/app/shared/services/buchung.service';
 import { Auffuehrung } from 'src/app/shared/models/auffuehrung.model';
 import { CommonModule } from '@angular/common';
-import { Film } from 'src/app/shared/models/film.model';
-import { Kinosaal } from 'src/app/shared/models/kinosaal.model';
 
 @Component({
   selector: 'app-auffuehrung-detail',
