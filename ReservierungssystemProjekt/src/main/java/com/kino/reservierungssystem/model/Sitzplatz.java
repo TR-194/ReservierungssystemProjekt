@@ -2,6 +2,7 @@ package com.kino.reservierungssystem.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Entity
 @Getter
@@ -29,5 +30,12 @@ public class Sitzplatz {
     @ManyToOne
     private Buchung buchung;
 
-    // Getter & Setter
+    // Transienter Lock zur Steuerung von Konkurrenzzugriffen – wird nicht in die DB geschrieben
+    @Transient
+    private final ReentrantLock lock = new ReentrantLock();
+
+    // Getter für den Lock
+    public ReentrantLock getLock() {
+        return lock;
+    }
 }

@@ -1,12 +1,16 @@
 package com.kino.reservierungssystem.controller;
 
+import com.kino.reservierungssystem.exception.ZahlungFehlgeschlagenException;
 import com.kino.reservierungssystem.model.Zahlung;
 import com.kino.reservierungssystem.service.ZahlungService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/zahlungen")
 public class ZahlungController {
+
     private final ZahlungService zahlungService;
 
     public ZahlungController(ZahlungService zahlungService) {
@@ -14,7 +18,12 @@ public class ZahlungController {
     }
 
     @PostMapping
-    public Zahlung createZahlung(@RequestBody Zahlung zahlung) {
-        return zahlungService.saveZahlung(zahlung);
+    public ResponseEntity<Zahlung> createZahlung(@RequestBody Zahlung zahlung) {
+        try {
+            Zahlung savedZahlung = zahlungService.saveZahlung(zahlung);
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedZahlung);
+        } catch (ZahlungFehlgeschlagenException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+        }
     }
 }

@@ -14,19 +14,7 @@ public class Statistik {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // In diesem Szenario werden die Statistiken über MongoDB berechnet.
+    // Deshalb enthält diese Klasse keine Berechnungsmethoden mehr.
     private double einnahmen;
-
-    public double berechneEinnahmenProAuffuehrung(Auffuehrung auffuehrung) {
-        return auffuehrung.getBuchungen().stream()
-                .mapToDouble(buchung -> buchung.getZahlung().getBetrag())
-                .sum();
-    }
-
-    public double berechneEinnahmenProFilm(Film film) {
-        return film.getAuffuehrungen().stream()
-                .mapToDouble(this::berechneEinnahmenProAuffuehrung)
-                .sum();
-    }
-
-    // Getter & Setter
 }
