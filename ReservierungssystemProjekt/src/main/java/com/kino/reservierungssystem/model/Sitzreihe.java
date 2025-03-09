@@ -1,6 +1,7 @@
 package com.kino.reservierungssystem.model;
 
 import jakarta.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.*;
 
@@ -24,8 +25,16 @@ public class Sitzreihe {
     @JoinColumn(name = "kinosaal_id")
     private Kinosaal kinosaal;
 
-    @OneToMany(mappedBy = "sitzreihe")
-    private List<Sitzplatz> sitzplaetze;
+    @OneToMany(mappedBy = "sitzreihe", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Sitzplatz> sitzplaetze = new ArrayList<>();
 
-    // Getter & Setter
+    /**
+     * Fügt einen Sitzplatz zur Reihe hinzu und pflegt die bidirektionale Beziehung.
+     *
+     * @param sitzplatz der hinzuzufügende Sitzplatz
+     */
+    public void addSitzplatz(Sitzplatz sitzplatz) {
+        sitzplaetze.add(sitzplatz);
+        sitzplatz.setSitzreihe(this);
+    }
 }

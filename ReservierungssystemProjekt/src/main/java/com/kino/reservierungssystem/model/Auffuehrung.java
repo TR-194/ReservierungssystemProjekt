@@ -34,6 +34,23 @@ public class Auffuehrung {
     @OneToMany(mappedBy = "auffuehrung")
     private List<Buchung> buchungen;
 
-
-    // Getter & Setter
+    /**
+     * Prüft, ob in einem der Sitzreihen des Kinosaals mindestens ein Sitzplatz FREI ist.
+     *
+     * @return true, wenn ein freier Sitzplatz vorhanden ist, sonst false.
+     */
+    public boolean istVerfuegbar() {
+        if (kinosaal != null && kinosaal.getSitzreihen() != null) {
+            for (Sitzreihe reihe : kinosaal.getSitzreihen()) {
+                if (reihe.getSitzplaetze() != null) {
+                    for (Sitzplatz platz : reihe.getSitzplaetze()) {
+                        if (platz.getStatus() == Status.FREI) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
 }

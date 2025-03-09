@@ -22,9 +22,13 @@ public class Zahlung {
     @JoinColumn(name = "buchung_id")
     private Buchung buchung;
 
+    /**
+     * Simuliert die Zahlungsvalidierung. Da es sich um eine Online-Zahlung handelt,
+     * wird hier immer true zurückgegeben.
+     *
+     * @return true, wenn die Zahlung validiert wurde (immer true in dieser Simulation)
+     */
     public boolean verarbeiten() {
-        // Logik für Zahlungsvalidierung
         return true;
     }
-
 }
