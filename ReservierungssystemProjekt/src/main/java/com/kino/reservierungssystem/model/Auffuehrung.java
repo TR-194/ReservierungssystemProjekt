@@ -34,6 +34,10 @@ public class Auffuehrung {
     @OneToMany(mappedBy = "auffuehrung")
     private List<Buchung> buchungen;
 
+    @ManyToOne
+    @JoinColumn(name = "preismodell_id")
+    private Preismodell preismodell;
+
     /**
      * Prüft, ob in einem der Sitzreihen des Kinosaals mindestens ein Sitzplatz FREI ist.
      *

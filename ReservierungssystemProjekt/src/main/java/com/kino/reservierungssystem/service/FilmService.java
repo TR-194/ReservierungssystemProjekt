@@ -27,7 +27,6 @@ public class FilmService {
         film.setTitel(filmDetails.getTitel());
         film.setAlterbeschraenkung(filmDetails.getAlterbeschraenkung());
         film.setDauer(filmDetails.getDauer());
-        // Weitere Attribute oder Beziehungen können hier angepasst werden
         return filmRepository.save(film);
     }
 
