@@ -1,6 +1,7 @@
 package com.kino.reservierungssystem.model;
 
 import jakarta.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.*;
 
@@ -18,8 +19,23 @@ public class Kinosaal {
     private String name;
     private boolean freigegeben;
 
-    @OneToMany(mappedBy = "kinosaal")
-    private List<Sitzreihe> sitzreihen;
+    @OneToMany(mappedBy = "kinosaal", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Sitzreihe> sitzreihen = new ArrayList<>();
 
-    // Getter & Setter
+    /**
+     * Markiert den Kinosaal als freigegeben.
+     */
+    public void freigeben() {
+        this.freigegeben = true;
+    }
+
+    /**
+     * Fügt eine Sitzreihe hinzu und pflegt die bidirektionale Beziehung.
+     *
+     * @param sitzreihe die hinzuzufügende Sitzreihe
+     */
+    public void addSitzreihe(Sitzreihe sitzreihe) {
+        sitzreihen.add(sitzreihe);
+        sitzreihe.setKinosaal(this);
+    }
 }

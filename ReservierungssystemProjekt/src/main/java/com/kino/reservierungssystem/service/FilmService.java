@@ -20,4 +20,18 @@ public class FilmService {
     public Film saveFilm(Film film) {
         return filmRepository.save(film);
     }
+
+    public Film updateFilm(Long id, Film filmDetails) {
+        Film film = filmRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Film not found"));
+        film.setTitel(filmDetails.getTitel());
+        film.setAlterbeschraenkung(filmDetails.getAlterbeschraenkung());
+        film.setDauer(filmDetails.getDauer());
+        // Weitere Attribute oder Beziehungen können hier angepasst werden
+        return filmRepository.save(film);
+    }
+
+    public void deleteFilm(Long id) {
+        filmRepository.deleteById(id);
+    }
 }
