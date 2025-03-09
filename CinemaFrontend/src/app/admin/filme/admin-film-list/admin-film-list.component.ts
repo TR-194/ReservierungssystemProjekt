@@ -3,9 +3,11 @@ import { Component, OnInit } from '@angular/core';
 import { FilmService } from 'src/app/shared/services/film.service';
 import { Film } from 'src/app/shared/models/film.model';
 import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-film-list',
+  imports: [CommonModule],
   templateUrl: './admin-film-list.component.html',
   styleUrls: ['./admin-film-list.component.css']
 })
@@ -26,7 +28,7 @@ export class AdminFilmListComponent implements OnInit {
   }
 
   erstelleNeuenFilm(): void {
-    this.router.navigate(['/admin/filme/neu']);
+    this.router.navigate(['/admin/filme/neuerFilm']);
   }
 
   bearbeiteFilm(id: number): void {

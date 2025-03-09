@@ -1,9 +1,9 @@
 <h2>Admin-Dashboard</h2>
 <nav>
   <ul>
-    <li><a routerLink="/admin/kinosaal">Kinosaal verwalten</a></li>
-    <li><a routerLink="/admin/auffuehrungen">Aufführungen verwalten</a></li>
-    <li><a routerLink="/admin/filme">Filme verwalten</a></li>
-    <li><a routerLink="/admin/statistik">Statistik anzeigen</a></li>
+    <li><button (click)="navigateTo('/admin/kinosaal')" class="nav-button">Kinosäle verwalten</button></li>
+    <li><button (click)="navigateTo('/admin/auffuehrung')" class="nav-button">Aufführungen verwalten</button></li>
+    <li><button (click)="navigateTo('/admin/filme')" class="nav-button">Filme verwalten</button></li>
+    <li><button (click)="navigateTo('/admin/statistik')" class="nav-button">Statistik anzeigen</button></li>
   </ul>
 </nav>

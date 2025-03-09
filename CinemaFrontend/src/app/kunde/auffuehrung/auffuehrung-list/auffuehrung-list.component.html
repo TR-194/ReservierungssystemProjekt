@@ -1,7 +1,7 @@
 <div class="auffuehrung-list">
   <h2>Aufführungen</h2>
   <ul>
-    <li *ngFor="let auffuehrung of auffuehrungen" (click)="geheZuDetail(auffuehrung.id)">
+    <li *ngFor="let auffuehrung of auffuehrungen" (click)="geheZuDetail(auffuehrung.id)" (keyup.enter)="geheZuDetail(auffuehrung.id)" tabindex="0">
       {{ auffuehrung.film.titel }} - {{ auffuehrung.datum }} um {{ auffuehrung.uhrzeit }}
     </li>
   </ul>

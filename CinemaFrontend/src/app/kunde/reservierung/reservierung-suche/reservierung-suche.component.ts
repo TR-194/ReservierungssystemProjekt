@@ -1,16 +1,17 @@
+import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-reservierung-suche',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './reservierung-suche.component.html',
   styleUrls: ['./reservierung-suche.component.css']
 })
 export class ReservierungSucheComponent {
   suchForm: FormGroup;
   reservierungGefunden = false;
-  reservierungsDaten: any = null;
+  reservierungsDaten: { name: string; email: string; sitzplaetze: string[]; status: string } | null = null;
 
   constructor(private fb: FormBuilder) {
     this.suchForm = this.fb.group({

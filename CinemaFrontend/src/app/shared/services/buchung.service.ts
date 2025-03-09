@@ -20,11 +20,11 @@ export class BuchungService {
   }
 
   createBuchung(buchung: Buchung): Observable<Buchung> {
-    return this.apiService.post<Buchung>(this.endpoint, buchung);
+    return this.apiService.post<Buchung, Buchung>(this.endpoint, buchung);
   }
 
   updateBuchung(id: number, buchung: Buchung): Observable<Buchung> {
-    return this.apiService.put<Buchung>(`${this.endpoint}/${id}`, buchung);
+    return this.apiService.put<Buchung, Buchung>(`${this.endpoint}/${id}`, buchung);
   }
 
   deleteBuchung(id: number): Observable<void> {

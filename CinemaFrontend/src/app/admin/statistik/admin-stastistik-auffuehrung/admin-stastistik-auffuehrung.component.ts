@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { AuffuehrungStatistikService } from 'src/app/shared/services/auffuehrung-statistik.service';
 
 interface AuffuehrungStatistik {
   id: number;
@@ -7,17 +8,20 @@ interface AuffuehrungStatistik {
   einnahmen: number;
 }
 
-
 @Component({
   selector: 'app-admin-stastistik-auffuehrung',
   imports: [CommonModule],
   templateUrl: './admin-stastistik-auffuehrung.component.html',
   styleUrl: './admin-stastistik-auffuehrung.component.css'
 })
-export class AdminStatistikAuffuehrungComponent {
-  
-  auffuehrungenStatistik: AuffuehrungStatistik[] = [
-    { id: 1, name: 'Aufführung 1', einnahmen: 5000 },
-    { id: 2, name: 'Aufführung 2', einnahmen: 3500 }
-  ];
+export class AdminStatistikAuffuehrungComponent implements OnInit {
+  auffuehrungenStatistik: AuffuehrungStatistik[] = [];
+
+  constructor(private auffuehrungStatistikService: AuffuehrungStatistikService) {}
+
+  ngOnInit(): void {
+    this.auffuehrungStatistikService.getAuffuehrungStatistik().subscribe(data => {
+      this.auffuehrungenStatistik = data;
+    });
+  }
 }

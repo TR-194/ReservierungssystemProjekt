@@ -1,18 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { AdminStatistikFilmComponent } from './admin-stastistik-film.component';
 
-import { AdminStastistikFilmComponent } from './admin-stastistik-film.component';
-
-describe('AdminStastistikFilmComponent', () => {
-  let component: AdminStastistikFilmComponent;
-  let fixture: ComponentFixture<AdminStastistikFilmComponent>;
+describe('AdminStatistikFilmComponent', () => {
+  let component: AdminStatistikFilmComponent;
+  let fixture: ComponentFixture<AdminStatistikFilmComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AdminStastistikFilmComponent]
+      imports: [AdminStatistikFilmComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(AdminStastistikFilmComponent);
+    fixture = TestBed.createComponent(AdminStatistikFilmComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

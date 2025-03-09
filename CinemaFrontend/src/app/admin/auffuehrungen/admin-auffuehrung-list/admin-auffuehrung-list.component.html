@@ -1,5 +1,5 @@
 <h2>Aufführungen verwalten</h2>
-<a routerLink="/admin/auffuehrungen/neu">Neue Aufführung hinzufügen</a>
+<button (click)="navigateToNewAuffuehrung()" class="nav-button">Neue Aufführung hinzufügen</button>
 <table>
   <tr>
     <th>Film</th>
@@ -9,10 +9,10 @@
     <th>Aktionen</th>
   </tr>
   <tr *ngFor="let auffuehrung of auffuehrungen">
-    <td>{{ auffuehrung.film }}</td>
+    <td>{{ auffuehrung.film.titel }}</td>
     <td>{{ auffuehrung.datum }}</td>
     <td>{{ auffuehrung.uhrzeit }}</td>
-    <td>{{ auffuehrung.saal }}</td>
+    <td>{{ auffuehrung.kinosaal.name }}</td>
     <td>
       <button (click)="deleteAuffuehrung(auffuehrung.id)">Löschen</button>
     </td>

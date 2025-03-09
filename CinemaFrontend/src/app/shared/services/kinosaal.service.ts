@@ -1,21 +1,43 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Kinosaal } from '../models/kinosaal.model';
+import { ApiService } from './api.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class KinosaalService {
-  private apiUrl = 'http://localhost:3000/kinosaele';
+  private endpoint = 'kinosaele';
 
-  constructor(private http: HttpClient) {}
+  constructor(private apiService: ApiService) {}
 
-  getKinosäle(): Observable<Kinosaal[]> {
-    return this.http.get<Kinosaal[]>(this.apiUrl);
+  // Alle Kinosäle abrufen
+  getKinosaele(): Observable<Kinosaal[]> {
+    return this.apiService.get<Kinosaal[]>(this.endpoint);
   }
 
+  // Einzelnen Kinosaal abrufen
+  getKinosaalById(id: number): Observable<Kinosaal> {
+    return this.apiService.get<Kinosaal>(`${this.endpoint}/${id}`);
+  }
+
+  // Neuen Kinosaal erstellen
   erstelleKinosaal(kinosaal: Kinosaal): Observable<Kinosaal> {
-    return this.http.post<Kinosaal>(this.apiUrl, kinosaal);
+    return this.apiService.post<Kinosaal, Kinosaal>(this.endpoint, kinosaal);
+  }
+
+  // Kinosaal aktualisieren
+  updateKinosaal(id: number, kinosaal: Kinosaal): Observable<Kinosaal> {
+    return this.apiService.put<Kinosaal, Kinosaal>(`${this.endpoint}/${id}`, kinosaal);
+  }
+
+  // Kinosaal löschen
+  deleteKinosaal(id: number): Observable<void> {
+    return this.apiService.delete(`${this.endpoint}/${id}`);
+  }
+
+  // Kinosaal freigeben
+  freigeben(id: number): Observable<void> {
+    return this.apiService.put<void, void>(`${this.endpoint}/${id}/freigeben`, {});
   }
 }

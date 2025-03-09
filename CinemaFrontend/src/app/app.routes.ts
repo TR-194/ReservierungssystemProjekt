@@ -14,6 +14,7 @@ import { AdminAuffuehrungListComponent } from './admin/auffuehrungen/admin-auffu
 import { AdminAuffuehrungFormComponent } from './admin/auffuehrungen/admin-auffuehrung-form/admin-auffuehrung-form.component';
 import { AdminFilmListComponent } from './admin/filme/admin-film-list/admin-film-list.component';
 import { AdminFilmFormComponent } from './admin/filme/admin-film-form/admin-film-form.component';
+import { NotFoundComponent } from './kunde/shared/not-found/not-found.component';
 
 export const appRoutes: Route[] = [
     { path: '', component: AuffuehrungListComponent},
@@ -32,4 +33,5 @@ export const appRoutes: Route[] = [
     { path: 'admin/auffuehrung/neueAuffuehrung', component: AdminAuffuehrungFormComponent},
     { path: 'admin/filme', component: AdminFilmListComponent},
     { path: 'admin/filme/neuerFilm', component: AdminFilmFormComponent},
+    { path: '**', component: NotFoundComponent }
 ];

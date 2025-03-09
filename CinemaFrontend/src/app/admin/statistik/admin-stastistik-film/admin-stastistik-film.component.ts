@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { FilmStatistikService } from 'src/app/shared/services/film-statistik.service';
 
 interface FilmStatistik {
   id: number;
@@ -7,16 +8,20 @@ interface FilmStatistik {
   einnahmen: number;
 }
 
-
 @Component({
   selector: 'app-admin-stastistik-film',
   imports: [CommonModule],
   templateUrl: './admin-stastistik-film.component.html',
   styleUrl: './admin-stastistik-film.component.css'
 })
-export class AdminStatistikFilmComponent {
-  filmeStatistik: FilmStatistik[] = [
-    { id: 1, titel: 'Film A', einnahmen: 12000 },
-    { id: 2, titel: 'Film B', einnahmen: 8000 }
-  ];
+export class AdminStatistikFilmComponent implements OnInit {
+  filmeStatistik: FilmStatistik[] = [];
+
+  constructor(private filmStatistikService: FilmStatistikService) {}
+
+  ngOnInit(): void {
+    this.filmStatistikService.getFilmStatistik().subscribe(data => {
+      this.filmeStatistik = data;
+    });
+  }
 }

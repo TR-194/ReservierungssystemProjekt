@@ -1,13 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-
-interface Auffuehrung {
-  id: number;
-  film: string;
-  datum: string;
-  uhrzeit: string;
-  saal: string;
-}
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { AuffuehrungService } from 'src/app/shared/services/auffuehrung.service';
+import { Auffuehrung } from 'src/app/shared/models/auffuehrung.model';
 
 @Component({
   selector: 'app-admin-auffuehrung-list',
@@ -15,13 +10,28 @@ interface Auffuehrung {
   templateUrl: './admin-auffuehrung-list.component.html',
   styleUrls: ['./admin-auffuehrung-list.component.css']
 })
-export class AdminAuffuehrungListComponent {
-  auffuehrungen: Auffuehrung[] = [
-    { id: 1, film: 'Film A', datum: '2025-03-10', uhrzeit: '18:00', saal: 'Saal 1' },
-    { id: 2, film: 'Film B', datum: '2025-03-11', uhrzeit: '20:00', saal: 'Saal 2' }
-  ];
+export class AdminAuffuehrungListComponent implements OnInit {
+  auffuehrungen: Auffuehrung[] = [];
+
+  constructor(private auffuehrungService: AuffuehrungService, private router: Router) {}
+
+  ngOnInit() {
+    this.loadAuffuehrungen();
+  }
+
+  loadAuffuehrungen() {
+    this.auffuehrungService.getAuffuehrungen().subscribe(data => {
+      this.auffuehrungen = data;
+    });
+  }
 
   deleteAuffuehrung(id: number) {
-    this.auffuehrungen = this.auffuehrungen.filter(a => a.id !== id);
+    this.auffuehrungService.deleteAuffuehrung(id).subscribe(() => {
+      this.loadAuffuehrungen();
+    });
+  }
+
+  navigateToNewAuffuehrung() {
+    this.router.navigate(['admin/auffuehrung/neueAuffuehrung']);
   }
 }

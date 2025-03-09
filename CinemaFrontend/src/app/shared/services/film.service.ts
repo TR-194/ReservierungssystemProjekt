@@ -1,33 +1,33 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Film } from '../models/film.model';
+import { ApiService } from './api.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FilmService {
-  private apiUrl = 'http://localhost:3000/filme';
+  private endpoint = 'filme';
 
-  constructor(private http: HttpClient) {}
+  constructor(private apiService: ApiService) {}
 
   getFilme(): Observable<Film[]> {
-    return this.http.get<Film[]>(this.apiUrl);
+    return this.apiService.get<Film[]>(this.endpoint);
   }
 
   getFilmById(id: number): Observable<Film> {
-    return this.http.get<Film>(`${this.apiUrl}/${id}`);
+    return this.apiService.get<Film>(`${this.endpoint}/${id}`);
   }
 
   erstelleFilm(film: Film): Observable<Film> {
-    return this.http.post<Film>(this.apiUrl, film);
+    return this.apiService.post<Film, Film>(this.endpoint, film);
   }
 
   bearbeiteFilm(id: number, film: Film): Observable<Film> {
-    return this.http.put<Film>(`${this.apiUrl}/${id}`, film);
+    return this.apiService.put<Film, Film>(`${this.endpoint}/${id}`, film);
   }
 
   loescheFilm(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+    return this.apiService.delete(`${this.endpoint}/${id}`);
   }
 }

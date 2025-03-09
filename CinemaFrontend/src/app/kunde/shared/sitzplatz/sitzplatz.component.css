@@ -2,15 +2,26 @@
     display: grid;
     grid-template-columns: repeat(10, 40px);
     gap: 5px;
-  }
-  .frei {
+}
+
+.frei {
     background-color: green;
     cursor: pointer;
-  }
-  .reserviert {
+    border-radius: 4px;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.frei:hover {
+    background-color: #28a745;
+    transform: scale(1.05);
+}
+
+.reserviert {
     background-color: orange;
-  }
-  .gebucht {
+    border-radius: 4px;
+}
+
+.gebucht {
     background-color: red;
-  }
-  
+    border-radius: 4px;
+}

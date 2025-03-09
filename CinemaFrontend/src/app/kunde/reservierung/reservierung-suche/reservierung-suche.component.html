@@ -6,10 +6,10 @@
   
   <div *ngIf="reservierungGefunden">
     <h3>Reservierung gefunden:</h3>
-    <p><strong>Name:</strong> {{ reservierungsDaten.name }}</p>
-    <p><strong>E-Mail:</strong> {{ reservierungsDaten.email }}</p>
-    <p><strong>Sitzplätze:</strong> {{ reservierungsDaten.sitzplaetze.join(', ') }}</p>
-    <p><strong>Status:</strong> {{ reservierungsDaten.status }}</p>
+    <p><strong>Name:</strong> {{ reservierungsDaten?.name }}</p>
+    <p><strong>E-Mail:</strong> {{ reservierungsDaten?.email }}</p>
+    <p><strong>Sitzplätze:</strong> {{ reservierungsDaten?.sitzplaetze?.join(', ') }}</p>
+    <p><strong>Status:</strong> {{ reservierungsDaten?.status }}</p>
   
     <button (click)="onBuchen()">Reservierung in Buchung umwandeln</button>
     <button (click)="onStornieren()">Reservierung stornieren</button>

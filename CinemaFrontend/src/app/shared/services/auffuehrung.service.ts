@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { ApiService } from './api.service';
 import { Observable } from 'rxjs';
 import { Auffuehrung } from '../models/auffuehrung.model';
 
@@ -7,15 +7,23 @@ import { Auffuehrung } from '../models/auffuehrung.model';
   providedIn: 'root'
 })
 export class AuffuehrungService {
-  private apiUrl = 'http://localhost:8080/api/auffuehrungen'; // Backend-Endpunkt
+  private endpoint = 'auffuehrungen';
 
-  constructor(private http: HttpClient) {}
+  constructor(private apiService: ApiService) {}
 
   getAuffuehrungen(): Observable<Auffuehrung[]> {
-    return this.http.get<Auffuehrung[]>(this.apiUrl);
+    return this.apiService.get<Auffuehrung[]>(this.endpoint);
   }
 
   getAuffuehrungById(id: number): Observable<Auffuehrung> {
-    return this.http.get<Auffuehrung>(`${this.apiUrl}/${id}`);
+    return this.apiService.get<Auffuehrung>(`${this.endpoint}/${id}`);
+  }
+
+  addAuffuehrung(auffuehrung: Auffuehrung): Observable<Auffuehrung> {
+    return this.apiService.post<Auffuehrung, Auffuehrung>(this.endpoint, auffuehrung);
+  }
+
+  deleteAuffuehrung(id: number): Observable<void> {
+    return this.apiService.delete(`${this.endpoint}/${id}`);
   }
 }
