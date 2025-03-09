@@ -1,0 +1,69 @@
+<div class="container">
+  <h2>Neuen Kinosaal erstellen</h2>
+
+  <form (ngSubmit)="speichereKinosaal()">
+    <div class="form-group">
+      <label for="name">Name des Kinosaals:</label>
+      <input
+        type="text"
+        id="name"
+        [(ngModel)]="name"
+        name="name"
+        required
+        class="form-control"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="freigegeben">Freigegeben:</label>
+      <input
+        type="checkbox"
+        id="freigegeben"
+        [(ngModel)]="freigegeben"
+        name="freigegeben"
+        class="form-check-input"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="kategorie">Kategorie:</label>
+      <select id="kategorie" [(ngModel)]="ausgewaehlteKategorie" name="kategorie" class="form-control">
+        <option *ngFor="let kategorie of kategorieTypen" [ngValue]="kategorie">{{ kategorie }}</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="neueSitzreihe">Sitzreihen:</label>
+      <input
+        type="number"
+        id="anzahlSitzplaetze"
+        [(ngModel)]="anzahlSitzplaetze"
+        name="anzahlSitzplaetze"
+        class="form-control"
+        placeholder="Anzahl der Sitzplätze"
+      />
+      <button type="button" class="btn btn-success" (click)="hinzufuegenSitzreihe()">Hinzufügen</button>
+    </div>
+
+    <ul class="list-group mt-2">
+      <li *ngFor="let reihe of sitzreihen; let i = index" class="list-group-item">
+        <div class="d-flex justify-content-between">
+          <span>Reihe {{ reihe.reihenNummer }} - Kategorie: {{ reihe.kategorie.name }}</span>
+          <button type="button" class="btn btn-danger btn-sm" (click)="entferneSitzreihe(i)">✖</button>
+        </div>
+        <div class="seat-layout">
+          <div class="row">
+            <div class="seat" *ngFor="let platz of reihe.sitzplaetze" [ngClass]="{'free': platz.status === 'frei', 'occupied': platz.status !== 'frei'}">
+              {{ platz.nummer }}
+            </div>
+          </div>
+        </div>
+      </li>
+    </ul>
+
+    <button type="submit" class="btn btn-primary mt-3">Speichern</button>
+    <button type="button" class="btn btn-secondary mt-3" (click)="navigateToKinosaal()">
+      Abbrechen
+    </button>
+  </form>
+</div>

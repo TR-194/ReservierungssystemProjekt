@@ -1,0 +1,29 @@
+<h2>Neue Aufführung hinzufügen</h2>
+<form (ngSubmit)="submitForm()">
+  <label for="film">Film:</label>
+  <select id="film" [(ngModel)]="auffuehrung.film" name="film" required>
+    <option *ngFor="let film of filme" [ngValue]="film">{{ film.titel }}</option>
+  </select>
+
+  <label for="datum">Datum:</label>
+  <input id="datum" type="date" [(ngModel)]="auffuehrung.datum" name="datum" required />
+
+  <label for="uhrzeit">Uhrzeit:</label>
+  <input id="uhrzeit" type="time" [(ngModel)]="auffuehrung.uhrzeit" name="uhrzeit" required />
+
+  <label for="kinosaal">Saal:</label>
+  <select id="kinosaal" [(ngModel)]="auffuehrung.kinosaal" name="kinosaal" required>
+    <option *ngFor="let saal of kinosaele" [ngValue]="saal">{{ saal.name }}</option>
+  </select>
+
+  <label for="logeMitServicePreis">Loge mit Service Preis:</label>
+  <input id="logeMitServicePreis" type="number" [(ngModel)]="auffuehrung.preismodell.logeMitServicePreis" name="logeMitServicePreis" required />
+
+  <label for="logePreis">Loge Preis:</label>
+  <input id="logePreis" type="number" [(ngModel)]="auffuehrung.preismodell.logePreis" name="logePreis" required />
+
+  <label for="parkettPreis">Parkett Preis:</label>
+  <input id="parkettPreis" type="number" [(ngModel)]="auffuehrung.preismodell.parkettPreis" name="parkettPreis" required />
+
+  <button type="submit">Speichern</button>
+</form>

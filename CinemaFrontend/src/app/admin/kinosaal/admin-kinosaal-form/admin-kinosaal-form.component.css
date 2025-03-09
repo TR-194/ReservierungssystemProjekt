@@ -1,0 +1,87 @@
+h2 {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.container {
+    background-color: #222;
+    color: white;
+    padding: 20px;
+    margin: 20px auto;
+    width: 50%;
+    border-radius: 8px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-control, .form-check-input, .btn {
+    background-color: #333;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px;
+}
+
+.form-control:focus, .form-check-input:focus, .btn:focus {
+    outline: none;
+    box-shadow: 0 0 5px #555;
+}
+
+.btn:hover {
+    background-color: #555;
+}
+
+.list-group-item {
+    background-color: #333;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.list-group-item .btn-danger {
+    background-color: #d9534f;
+    border: none;
+}
+
+.list-group-item .btn-danger:hover {
+    background-color: #c9302c;
+}
+
+.seat-layout {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.row {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.seat {
+    width: 30px;
+    height: 30px;
+    background-color: #333;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 5px;
+    border-radius: 4px;
+}
+
+.seat.free {
+    background-color: #5cb85c;
+}
+
+.seat.occupied {
+    background-color: #d9534f;
+}
