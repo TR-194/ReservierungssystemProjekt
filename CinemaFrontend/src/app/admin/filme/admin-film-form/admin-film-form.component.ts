@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FilmService } from 'src/app/shared/services/film.service';
@@ -15,7 +15,7 @@ import { ActivatedRoute, Router } from '@angular/router';
   styleUrls: ['./admin-film-form.component.css']
 })
 export class AdminFilmFormComponent implements OnInit {
-  film: Film = { id: 0, titel: '', genre: '', dauer: 0 };
+  film: Film = { id: 0, titel: '', genre: '', dauer: 0, fsk: 0 };
   filmId?: number;
 
   constructor(
