@@ -17,4 +17,6 @@ public class ReservierungDTO {
     private List<Long> sitzplatzIds;
     private String status;
     private double preis;
+    private String email;
+    private String name;
 }
