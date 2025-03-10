@@ -1,12 +1,18 @@
 package com.kino.reservierungssystem.dto;
 
 import lombok.Data;
-import java.util.Date;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.time.LocalDate;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ZahlungDTO {
-    private Long id;
-    private Long buchungId;
-    private Double betrag;
-    private Date zahlungsdatum;
+    private String transaktionsId; // Eindeutige ID für die Zahlung
+    private double betrag;
+    private LocalDate zahlungsdatum;
+    private String methode; // z. B. "Bar",
 }

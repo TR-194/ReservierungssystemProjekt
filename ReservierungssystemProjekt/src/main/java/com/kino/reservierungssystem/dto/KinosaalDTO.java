@@ -10,11 +10,9 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ReservierungDTO {
+public class KinosaalDTO {
     private Long id;
-    private Long kundeId;
-    private Long auffuehrungId;
-    private List<Long> sitzplatzIds;
-    private String status;
-    private double preis;
+    private String name;
+    private boolean freigegeben;
+    private List<SitzreiheDTO> sitzreihen;
 }

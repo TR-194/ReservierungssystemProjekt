@@ -1,15 +1,16 @@
 package com.kino.reservierungssystem.controller;
 
-import com.kino.reservierungssystem.model.Film;
+
+import com.kino.reservierungssystem.dto.FilmDTO;
 import com.kino.reservierungssystem.service.FilmService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/filme")
 public class FilmController {
+
     private final FilmService filmService;
 
     public FilmController(FilmService filmService) {
@@ -17,26 +18,27 @@ public class FilmController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Film>> getAllFilme() {
-        List<Film> filme = filmService.getAllFilme();
-        return ResponseEntity.ok(filme);
+    public List<FilmDTO> getAllFilme() {
+        return filmService.getAllFilme();
+    }
+
+    @GetMapping("/{id}")
+    public FilmDTO getFilmById(@PathVariable Long id) {
+        return filmService.getFilmById(id);
     }
 
     @PostMapping
-    public ResponseEntity<Film> createFilm(@RequestBody Film film) {
-        Film savedFilm = filmService.saveFilm(film);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedFilm);
+    public FilmDTO createFilm(@RequestBody FilmDTO filmDTO) {
+        return filmService.createFilm(filmDTO);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Film> updateFilm(@PathVariable Long id, @RequestBody Film filmDetails) {
-        Film updatedFilm = filmService.updateFilm(id, filmDetails);
-        return ResponseEntity.ok(updatedFilm);
+    public FilmDTO updateFilm(@PathVariable Long id, @RequestBody FilmDTO filmDTO) {
+        return filmService.updateFilm(id, filmDTO);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteFilm(@PathVariable Long id) {
+    public void deleteFilm(@PathVariable Long id) {
         filmService.deleteFilm(id);
-        return ResponseEntity.noContent().build();
     }
 }

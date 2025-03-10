@@ -34,6 +34,10 @@ public class Auffuehrung {
     @OneToMany(mappedBy = "auffuehrung")
     private List<Buchung> buchungen;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "preismodell_id", referencedColumnName = "id")
+    private Preismodell preismodell;
+
     /**
      * Prüft, ob in einem der Sitzreihen des Kinosaals mindestens ein Sitzplatz FREI ist.
      *

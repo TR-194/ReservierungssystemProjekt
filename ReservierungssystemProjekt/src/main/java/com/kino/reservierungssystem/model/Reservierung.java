@@ -31,6 +31,8 @@ public class Reservierung {
     @OneToMany(mappedBy = "reservierung")
     private List<Sitzplatz> sitzplaetze;
 
+    private double preis;
+
     /**
      * Prüft, ob die Reservierung noch gültig ist.
      *

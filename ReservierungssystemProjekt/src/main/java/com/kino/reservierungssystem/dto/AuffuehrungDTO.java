@@ -4,17 +4,18 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import java.util.List;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ReservierungDTO {
+public class AuffuehrungDTO {
     private Long id;
-    private Long kundeId;
-    private Long auffuehrungId;
-    private List<Long> sitzplatzIds;
-    private String status;
-    private double preis;
+    private LocalDate datum;
+    private LocalTime uhrzeit;
+    private Long filmId;
+    private Long kinosaalId;
+    private PreismodellDTO preismodell;
 }

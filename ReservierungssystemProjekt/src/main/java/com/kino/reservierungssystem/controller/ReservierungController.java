@@ -1,5 +1,6 @@
 package com.kino.reservierungssystem.controller;
 
+import com.kino.reservierungssystem.dto.ReservierungDTO;
 import com.kino.reservierungssystem.exception.ReservierungAbgelaufenException;
 import com.kino.reservierungssystem.exception.UngueltigeBuchungException;
 import com.kino.reservierungssystem.model.Buchung;
@@ -18,6 +19,11 @@ public class ReservierungController {
 
     public ReservierungController(ReservierungService reservierungService) {
         this.reservierungService = reservierungService;
+    }
+
+    @GetMapping
+    public List<ReservierungDTO> getAllReservierungen() {
+        return reservierungService.getAllReservierungen();
     }
 
     @GetMapping("/{kundeId}")

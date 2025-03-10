@@ -4,17 +4,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ReservierungDTO {
+public class SitzkategorieDTO {
     private Long id;
-    private Long kundeId;
-    private Long auffuehrungId;
-    private List<Long> sitzplatzIds;
-    private String status;
+    private String name;
     private double preis;
 }
