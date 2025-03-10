@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ReservierungService } from 'src/app/shared/services/reservierung.service';
+import { Reservierung } from 'src/app/shared/models/reservierung.model';
 
 @Component({
   selector: 'app-reservierung-suche',
@@ -11,9 +13,9 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 export class ReservierungSucheComponent {
   suchForm: FormGroup;
   reservierungGefunden = false;
-  reservierungsDaten: { name: string; email: string; sitzplaetze: string[]; status: string } | null = null;
+  reservierungsDaten: Reservierung | null = null;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private reservierungService: ReservierungService) {
     this.suchForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]]
     });
@@ -24,29 +26,46 @@ export class ReservierungSucheComponent {
       const email = this.suchForm.value.email;
       console.log('Suche Reservierung für:', email);
       
-      // Später hier die Backend-Anbindung, um die Reservierung zu suchen
-      // Temporäre Simulation einer gefundenen Reservierung
-      setTimeout(() => {
-        this.reservierungGefunden = true;
-        this.reservierungsDaten = {
-          name: 'Max Mustermann',
-          email: email,
-          sitzplaetze: ['A1', 'A2'],
-          status: 'Reserviert'
-        };
-      }, 1000);
+      this.reservierungService.getReservierungByEmail(email).subscribe(
+        (reservierung: Reservierung) => {
+          this.reservierungGefunden = true;
+          this.reservierungsDaten = reservierung;
+        },
+        (error) => {
+          console.error('Fehler beim Suchen der Reservierung:', error);
+          this.reservierungGefunden = false;
+          this.reservierungsDaten = null;
+        }
+      );
     }
   }
 
   onBuchen() {
-    console.log('Reservierung in Buchung umwandeln:', this.reservierungsDaten);
-    // Später Backend-Aufruf zum Buchen der Reservierung
+    if (this.reservierungsDaten) {
+      console.log('Reservierung in Buchung umwandeln:', this.reservierungsDaten);
+      this.reservierungService.updateReservierung(this.reservierungsDaten.id, { ...this.reservierungsDaten, status: 'Gebucht' }).subscribe(
+        (updatedReservierung: Reservierung) => {
+          this.reservierungsDaten = updatedReservierung;
+        },
+        (error) => {
+          console.error('Fehler beim Buchen der Reservierung:', error);
+        }
+      );
+    }
   }
 
   onStornieren() {
-    console.log('Reservierung stornieren:', this.reservierungsDaten);
-    // Später Backend-Aufruf zur Stornierung der Reservierung
-    this.reservierungGefunden = false;
-    this.reservierungsDaten = null;
+    if (this.reservierungsDaten) {
+      console.log('Reservierung stornieren:', this.reservierungsDaten);
+      this.reservierungService.deleteReservierung(this.reservierungsDaten.id).subscribe(
+        () => {
+          this.reservierungGefunden = false;
+          this.reservierungsDaten = null;
+        },
+        (error) => {
+          console.error('Fehler beim Stornieren der Reservierung:', error);
+        }
+      );
+    }
   }
 }

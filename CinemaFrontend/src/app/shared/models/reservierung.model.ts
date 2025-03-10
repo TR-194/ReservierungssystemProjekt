@@ -12,4 +12,7 @@ export interface Reservierung {
   datum: Date;
   uhrzeit: string;
   preis: number;
+  name: string; // Added property
+  email: string; // Added property
+  status: string; // Added property
 }

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { ApiService } from '../services/api.service';
 import { Observable } from 'rxjs';
 import { Reservierung } from '../models/reservierung.model';
+import { HttpParams } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -29,5 +30,10 @@ export class ReservierungService {
 
   deleteReservierung(id: number): Observable<void> {
     return this.apiService.delete(`${this.endpoint}/${id}`);
+  }
+
+  getReservierungByEmail(email: string): Observable<Reservierung> {
+    const params = new HttpParams().set('email', email);
+    return this.apiService.get<Reservierung>(`${this.endpoint}/by-email`, { params });
   }
 }
