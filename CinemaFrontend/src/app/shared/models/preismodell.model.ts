@@ -1,5 +1,6 @@
 export interface Preismodell {
-  logeMitServicePreis: number;
-  logePreis: number;
+  id: number;
   parkettPreis: number;
+  logePreis: number;
+  logeMitServicePreis: number;
 }

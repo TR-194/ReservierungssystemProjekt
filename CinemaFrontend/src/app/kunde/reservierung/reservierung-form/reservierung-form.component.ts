@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { Reservierung } from 'src/app/shared/models/reservierung.model';
-import { ReservierungService } from 'src/app/shared/services/reservierung.service';
+import { KafkaService } from 'src/app/shared/services/kafka.service';
+import { Sitzplatz } from 'src/app/shared/models/sitzplatz.model';
 
 @Component({
   selector: 'app-reservierung-form',
@@ -12,37 +12,55 @@ import { ReservierungService } from 'src/app/shared/services/reservierung.servic
 })
 export class ReservierungFormComponent implements OnInit {
   reservierungForm: FormGroup;
+  verfügbareSitzplätze: Sitzplatz[] = [];
 
   constructor(
-    private fb: FormBuilder, 
+    private fb: FormBuilder,
     private route: ActivatedRoute,
-    private reservierungService: ReservierungService
+    private kafkaService: KafkaService
   ) {
     this.reservierungForm = this.fb.group({
       name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      sitzplaetze: [[], Validators.required],
-      film: [null, Validators.required],
-      auffuehrung: [null, Validators.required],
-      kinosaal: [null, Validators.required]
+      sitzplatzIds: [[], Validators.required], // Statt sitzplaetze -> sitzplatzIds
+      auffuehrungId: [null, Validators.required]
     });
   }
 
   ngOnInit(): void {
+    // Daten aus Query-Params holen
     this.route.queryParams.subscribe(params => {
-      const sitzplaetze = params['sitzplaetze'] ? params['sitzplaetze'].split(',') : [];
-      this.reservierungForm.patchValue({ sitzplaetze });
+      const sitzplatzIds = params['sitzplaetze'] ? params['sitzplaetze'].split(',').map(Number) : [];
+      this.reservierungForm.patchValue({ sitzplatzIds });
+
+      // Falls `auffuehrungId` aus den Parametern kommt, setzen
+      if (params['auffuehrungId']) {
+        this.reservierungForm.patchValue({ auffuehrungId: Number(params['auffuehrungId']) });
+      }
     });
+
+    // Verfügbare Sitzplätze aus Kafka abrufen
+    this.ladeVerfügbareSitzplätze();
+  }
+
+  ladeVerfügbareSitzplätze(): void {
+    this.kafkaService.sendRequest<Sitzplatz[]>('sitzplatz.getVerfügbare')
+      .subscribe(sitzplaetze => {
+        this.verfügbareSitzplätze = sitzplaetze;
+      });
   }
 
   onSubmit() {
     if (this.reservierungForm.valid) {
-      const reservierung: Reservierung = this.reservierungForm.value;
+      const reservierung = this.reservierungForm.value;
       console.log('Reservierung:', reservierung);
-      this.reservierungService.createReservierung(reservierung).subscribe(
-        response => console.log('Reservierung erfolgreich:', response),
-        error => console.error('Fehler bei der Reservierung:', error)
-      );
+
+      // Reservierung über Kafka senden
+      this.kafkaService.sendRequest('reservierung.create', reservierung)
+        .subscribe(
+          response => console.log('Reservierung erfolgreich:', response),
+          error => console.error('Fehler bei der Reservierung:', error)
+        );
     }
   }
 }

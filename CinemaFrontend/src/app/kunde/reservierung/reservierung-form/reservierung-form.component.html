@@ -1,12 +1,16 @@
 <form [formGroup]="reservierungForm" (ngSubmit)="onSubmit()">
-    <label for="name">Name:</label>
-    <input id="name" formControlName="name" required />
-  
-    <label for="email">E-Mail:</label>
-    <input id="email" formControlName="email" type="email" required />
-  
-    <label for="sitzplaetze">Sitzplätze:</label>
-    <input id="sitzplaetze" formControlName="sitzplaetze" required />
-  
-    <button type="submit" [disabled]="reservierungForm.invalid">Reservieren</button>
-  </form>
+  <label for="name">Name:</label>
+  <input id="name" formControlName="name" required />
+
+  <label for="email">E-Mail:</label>
+  <input id="email" formControlName="email" type="email" required />
+
+  <label for="sitzplaetze">Sitzplätze:</label>
+  <select id="sitzplaetze" formControlName="sitzplatzIds" multiple>
+    <option *ngFor="let platz of verfuegbareSitzplaetze" [value]="platz.id">
+      Sitzplatz {{ platz.nummer }} ({{ platz.status }})
+    </option>
+  </select>
+
+  <button type="submit" [disabled]="reservierungForm.invalid">Reservieren</button>
+</form>

@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { AuffuehrungService } from 'src/app/shared/services/auffuehrung.service';
+import { KafkaService } from 'src/app/shared/services/kafka.service';
 import { Auffuehrung } from 'src/app/shared/models/auffuehrung.model';
 import { Router } from '@angular/router';
+import { Film } from 'src/app/shared/models/film.model';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -12,9 +13,10 @@ import { CommonModule } from '@angular/common';
 })
 export class AuffuehrungListComponent implements OnInit {
   auffuehrungen: Auffuehrung[] = [];
+  filme: Map<number, string> = new Map(); // Speichert die Filmnamen zu den Film-IDs
 
   constructor(
-    private auffuehrungService: AuffuehrungService,
+    private kafkaService: KafkaService,
     private router: Router
   ) {}
 
@@ -23,10 +25,30 @@ export class AuffuehrungListComponent implements OnInit {
   }
 
   ladeAuffuehrungen(): void {
-    this.auffuehrungService.getAuffuehrungen().subscribe(
-      (data: Auffuehrung[]) => this.auffuehrungen = data,
-      error => console.error('Fehler beim Laden der Aufführungen', error)
-    );
+    this.kafkaService.sendRequest<Auffuehrung[]>('auffuehrung.getAll')
+      .subscribe(
+        (data: Auffuehrung[]) => {
+          this.auffuehrungen = data;
+          this.ladeFilme(data.map(a => a.filmId)); // Lade die Filmdetails
+        },
+        error => console.error('Fehler beim Laden der Aufführungen', error)
+      );
+  }
+
+  ladeFilme(filmIds: number[]): void {
+    filmIds.forEach(filmId => {
+      if (!this.filme.has(filmId)) { // Verhindert doppelte Anfragen
+        this.kafkaService.sendRequest<Film>('film.getById', filmId)
+          .subscribe(
+            film => this.filme.set(film.id, film.titel),
+            error => console.error(`Fehler beim Laden des Films mit ID ${filmId}`, error)
+          );
+      }
+    });
+  }
+
+  getFilmTitel(filmId: number): string {
+    return this.filme.get(filmId) || 'Lädt...';
   }
 
   geheZuDetail(id: number): void {

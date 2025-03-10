@@ -1,4 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 interface Sitzplatz {
   id: number;
@@ -9,6 +10,7 @@ interface Sitzplatz {
 
 @Component({
   selector: 'app-sitzplatz',
+  imports: [CommonModule],
   templateUrl: './sitzplatz.component.html',
   styleUrls: ['./sitzplatz.component.css']
 })

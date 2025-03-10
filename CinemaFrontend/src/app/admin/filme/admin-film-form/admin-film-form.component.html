@@ -1,16 +1,21 @@
 <div class="film-form">
   <h2>{{ filmId ? 'Film bearbeiten' : 'Neuen Film hinzufügen' }}</h2>
-  <label>
-    Titel:
-    <input type="text" [(ngModel)]="film.titel">
-  </label>
-  <label>
-    FSK:
-    <input type="text" [(ngModel)]="film.fsk">
-  </label>
-  <label>
-    Dauer (Minuten):
-    <input type="number" [(ngModel)]="film.dauer">
-  </label>
-  <button (click)="speichereFilm()">Speichern</button>
+  <form (ngSubmit)="speichereFilm()">
+    <label>
+      Titel:
+      <input type="text" [(ngModel)]="film.titel" required>
+    </label>
+
+    <label>
+      FSK:
+      <input type="number" [(ngModel)]="film.fsk" required>
+    </label>
+
+    <label>
+      Dauer (Minuten):
+      <input type="number" [(ngModel)]="film.dauer" required>
+    </label>
+
+    <button type="submit">Speichern</button>
+  </form>
 </div>

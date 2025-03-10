@@ -1,12 +1,12 @@
-
 import { Component, OnInit } from '@angular/core';
-import { FilmService } from 'src/app/shared/services/film.service';
+import { KafkaService } from 'src/app/shared/services/kafka.service';
 import { Film } from 'src/app/shared/models/film.model';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-film-list',
+  selector: 'app-admin-film-list',
+  standalone: true,
   imports: [CommonModule],
   templateUrl: './admin-film-list.component.html',
   styleUrls: ['./admin-film-list.component.css']
@@ -14,14 +14,14 @@ import { CommonModule } from '@angular/common';
 export class AdminFilmListComponent implements OnInit {
   filme: Film[] = [];
 
-  constructor(private filmService: FilmService, private router: Router) {}
+  constructor(private kafkaService: KafkaService, private router: Router) {}
 
   ngOnInit(): void {
     this.ladeFilme();
   }
 
   ladeFilme(): void {
-    this.filmService.getFilme().subscribe(
+    this.kafkaService.sendRequest<Film[]>('film.getAll').subscribe(
       (data: Film[]) => this.filme = data,
       error => console.error('Fehler beim Laden der Filme', error)
     );
@@ -36,7 +36,7 @@ export class AdminFilmListComponent implements OnInit {
   }
 
   loescheFilm(id: number): void {
-    this.filmService.loescheFilm(id).subscribe(
+    this.kafkaService.sendRequest<void>('film.delete', id).subscribe(
       () => this.ladeFilme(),
       error => console.error('Fehler beim Löschen des Films', error)
     );

@@ -1,5 +1,7 @@
 export interface Zahlung {
-    betrag: number;
-    zahlungsdatum: Date;
-    methode: 'Bar'; 
-  }
+  id: number;
+  betrag: number;
+  zahlungsdatum: string;  // ISO-Format: YYYY-MM-DD
+  methode: 'Bar'; 
+  buchungId: number; // Verknüpfung zur Buchung
+}

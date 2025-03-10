@@ -1,10 +1,7 @@
-import { Kunde } from './kunde.model';
-import { Zahlung } from './zahlung.model';
-
 export interface Buchung {
-  id?: number;              // Optional für bestehende Buchungen
-  kunde: Kunde;             // Der Kunde, der die Buchung durchführt
-  auffuehrungId: number;    // ID der gebuchten Aufführung
-  sitzplaetze: number[];    // Liste der Sitzplatz-IDs
-  zahlung: Zahlung;         // Zahlungsdetails
+  id?: number;  // Optional für neue Buchungen
+  kundeId: number;  // ID des Kunden
+  auffuehrungId: number;  // ID der gebuchten Aufführung
+  sitzplatzIds: number[];  // Liste der Sitzplatz-IDs
+  zahlungId?: number;  // Falls Zahlung separat gespeichert wird
 }

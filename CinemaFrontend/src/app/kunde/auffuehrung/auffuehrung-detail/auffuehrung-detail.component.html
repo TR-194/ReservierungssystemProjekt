@@ -1,21 +1,21 @@
 <div *ngIf="auffuehrung">
-  <h2>{{ auffuehrung.film.titel }}</h2>
+  <h2>{{ film?.titel }}</h2>
   <p>Datum: {{ auffuehrung.datum }}</p>
   <p>Uhrzeit: {{ auffuehrung.uhrzeit }}</p>
-  <p>Saal: {{ auffuehrung.kinosaal.name }}</p>
+  <p>Saal: {{ kinosaal?.name }}</p>
+
+  <h3>Sitzplätze auswählen</h3>
   <div class="sitzplaetze">
-    <h3>Sitzplätze auswählen</h3>
-    <div *ngFor="let reihe of auffuehrung.kinosaal.sitzreihen">
-      <h4>Reihe {{ reihe.reihenNummer }}</h4>
-      <div *ngFor="let sitzplatz of reihe.sitzplaetze">
-        <button (click)="onSitzplatzAuswaehlen(sitzplatz.id)"
-                [class.selected]="ausgewaehlteSitze.includes(sitzplatz.id)"
-                [disabled]="sitzplatz.status !== 'frei'">
-          {{ sitzplatz.nummer }} ({{ sitzplatz.status }})
-        </button>
-      </div>
+    <div *ngFor="let sitzplatz of sitzplaetze">
+      <button 
+        (click)="onSitzplatzAuswaehlen(sitzplatz.id)"
+        [class.selected]="ausgewaehlteSitze.includes(sitzplatz.id)"
+        [disabled]="sitzplatz.status !== 'frei'">
+        {{ sitzplatz.nummer }}
+      </button>
     </div>
   </div>
+
   <button (click)="reservieren()">Reservieren</button>
   <button (click)="buchen()">Buchen</button>
 </div>

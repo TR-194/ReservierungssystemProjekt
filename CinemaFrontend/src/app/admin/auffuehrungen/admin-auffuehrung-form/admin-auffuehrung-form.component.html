@@ -1,21 +1,26 @@
 <h2>Neue Aufführung hinzufügen</h2>
 <form (ngSubmit)="submitForm()">
+  <!-- Auswahl Film -->
   <label for="film">Film:</label>
-  <select id="film" [(ngModel)]="auffuehrung.film" name="film" required>
-    <option *ngFor="let film of filme" [ngValue]="film">{{ film.titel }}</option>
+  <select id="film" [(ngModel)]="auffuehrung.filmId" name="film" required>
+    <option *ngFor="let film of filme" [value]="film.id">{{ film.titel }}</option>
   </select>
 
+  <!-- Auswahl Datum -->
   <label for="datum">Datum:</label>
   <input id="datum" type="date" [(ngModel)]="auffuehrung.datum" name="datum" required />
 
+  <!-- Auswahl Uhrzeit -->
   <label for="uhrzeit">Uhrzeit:</label>
   <input id="uhrzeit" type="time" [(ngModel)]="auffuehrung.uhrzeit" name="uhrzeit" required />
 
+  <!-- Auswahl Kinosaal -->
   <label for="kinosaal">Saal:</label>
-  <select id="kinosaal" [(ngModel)]="auffuehrung.kinosaal" name="kinosaal" required>
-    <option *ngFor="let saal of kinosaele" [ngValue]="saal">{{ saal.name }}</option>
+  <select id="kinosaal" [(ngModel)]="auffuehrung.kinosaalId" name="kinosaal" required>
+    <option *ngFor="let saal of kinosaele" [value]="saal.id">{{ saal.name }}</option>
   </select>
 
+  <!-- Preismodell -->
   <label for="logeMitServicePreis">Loge mit Service Preis:</label>
   <input id="logeMitServicePreis" type="number" [(ngModel)]="auffuehrung.preismodell.logeMitServicePreis" name="logeMitServicePreis" required />
 

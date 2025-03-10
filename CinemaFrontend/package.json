@@ -17,7 +17,12 @@
     "@angular/platform-browser": "~19.1.0",
     "@angular/platform-browser-dynamic": "~19.1.0",
     "@angular/router": "~19.1.0",
+    "@stomp/stompjs": "^7.0.1",
+    "buffer": "^6.0.3",
+    "crypto-browserify": "^3.12.1",
     "rxjs": "~7.8.0",
+    "sockjs-client": "^1.6.1",
+    "stream-browserify": "^3.0.0",
     "zone.js": "~0.15.0"
   },
   "devDependencies": {
@@ -28,7 +33,7 @@
     "@angular/compiler-cli": "~19.1.0",
     "@angular/language-service": "~19.1.0",
     "@eslint/js": "^9.8.0",
-    "@nx/angular": "20.4.6",
+    "@nx/angular": "^20.4.6",
     "@nx/eslint": "20.4.6",
     "@nx/eslint-plugin": "20.4.6",
     "@nx/jest": "20.4.6",
@@ -41,6 +46,7 @@
     "@swc/helpers": "~0.5.11",
     "@types/jest": "^29.5.12",
     "@types/node": "18.16.9",
+    "@types/sockjs-client": "^1.5.4",
     "@typescript-eslint/utils": "^8.19.0",
     "angular-eslint": "^19.0.2",
     "eslint": "^9.8.0",
@@ -58,5 +64,10 @@
   },
   "nx": {
     "includedScripts": []
+  },
+  "browser": {
+    "crypto": "crypto-browserify",
+    "stream": "stream-browserify",
+    "buffer": "buffer"
   }
 }
