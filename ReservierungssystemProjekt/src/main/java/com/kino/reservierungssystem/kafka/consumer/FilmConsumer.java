@@ -1,62 +1,51 @@
 package com.kino.reservierungssystem.kafka.consumer;
 
 import com.kino.reservierungssystem.dto.FilmDTO;
-import com.kino.reservierungssystem.kafka.response.KafkaResponseHandler;
 import com.kino.reservierungssystem.mapper.FilmMapper;
 import com.kino.reservierungssystem.model.Film;
 import com.kino.reservierungssystem.repository.FilmRepository;
+import com.kino.reservierungssystem.kafka.response.KafkaResponseHandler;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-@Component
+@Service
 public class FilmConsumer {
 
     private final FilmRepository filmRepository;
-    private final KafkaResponseHandler kafkaResponseHandler;
     private final FilmMapper filmMapper;
+    private final KafkaResponseHandler kafkaResponseHandler;
 
-    public FilmConsumer(FilmRepository filmRepository, KafkaResponseHandler kafkaResponseHandler, FilmMapper filmMapper) {
+    public FilmConsumer(FilmRepository filmRepository, FilmMapper filmMapper, KafkaResponseHandler kafkaResponseHandler) {
         this.filmRepository = filmRepository;
-        this.kafkaResponseHandler = kafkaResponseHandler;
         this.filmMapper = filmMapper;
+        this.kafkaResponseHandler = kafkaResponseHandler;
     }
 
-    @KafkaListener(topics = "kino.film.getAll", groupId = "kino-group")
-    public void handleFilmAnfrage(String requestId) {
+    @KafkaListener(topics = "film.getById", groupId = "kino-group")
+    public void handleGetFilmById(Map<String, Object> request) {
+        String requestId = (String) request.get("requestId");
+        Long filmId = ((Number) request.get("data")).longValue();
+
+        Film film = filmRepository.findById(filmId)
+                .orElseThrow(() -> new RuntimeException("Film nicht gefunden"));
+
+        FilmDTO filmDTO = filmMapper.fromEntity(film);
+
+        kafkaResponseHandler.sendResponse(requestId, filmDTO);
+    }
+
+    @KafkaListener(topics = "film.getAll", groupId = "kino-group")
+    public void handleGetAllFilme(Map<String, Object> request) {
+        String requestId = (String) request.get("requestId");
+
         List<FilmDTO> filme = filmRepository.findAll().stream()
                 .map(filmMapper::fromEntity)
                 .collect(Collectors.toList());
+
         kafkaResponseHandler.sendResponse(requestId, filme);
-    }
-
-    @KafkaListener(topics = "kino.film.getById", groupId = "kino-group")
-    public void handleFilmByIdAnfrage(String requestId, Long id) {
-        Film film = filmRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Film nicht gefunden mit ID: " + id));
-        kafkaResponseHandler.sendResponse(requestId, filmMapper.fromEntity(film));
-    }
-
-    @KafkaListener(topics = "kino.film.create", groupId = "kino-group")
-    public void handleFilmErstellt(FilmDTO filmDTO) {
-        Film film = filmMapper.toEntity(filmDTO);
-        filmRepository.save(film);
-    }
-
-    @KafkaListener(topics = "kino.film.update", groupId = "kino-group")
-    public void handleFilmAktualisiert(FilmDTO filmDTO) {
-        Film film = filmRepository.findById(filmDTO.getId())
-                .orElseThrow(() -> new RuntimeException("Film nicht gefunden mit ID: " + filmDTO.getId()));
-        film.setTitel(filmDTO.getTitel());
-        film.setAlterbeschraenkung(filmDTO.getAlterbeschraenkung());
-        film.setDauer(filmDTO.getDauer());
-        filmRepository.save(film);
-    }
-
-    @KafkaListener(topics = "kino.film.delete", groupId = "kino-group")
-    public void handleFilmGeloescht(Long id) {
-        filmRepository.deleteById(id);
     }
 }

@@ -2,93 +2,52 @@ package com.kino.reservierungssystem.kafka.consumer;
 
 import com.kino.reservierungssystem.dto.ReservierungDTO;
 import com.kino.reservierungssystem.mapper.ReservierungMapper;
-import com.kino.reservierungssystem.model.Buchung;
 import com.kino.reservierungssystem.model.Reservierung;
-import com.kino.reservierungssystem.repository.BuchungRepository;
 import com.kino.reservierungssystem.repository.ReservierungRepository;
+import com.kino.reservierungssystem.kafka.response.KafkaResponseHandler;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 public class ReservierungConsumer {
 
     private final ReservierungRepository reservierungRepository;
-    private final BuchungRepository buchungRepository;
     private final ReservierungMapper reservierungMapper;
+    private final KafkaResponseHandler kafkaResponseHandler;
 
     public ReservierungConsumer(ReservierungRepository reservierungRepository,
-                                BuchungRepository buchungRepository,
-                                ReservierungMapper reservierungMapper) {
+                                ReservierungMapper reservierungMapper,
+                                KafkaResponseHandler kafkaResponseHandler) {
         this.reservierungRepository = reservierungRepository;
-        this.buchungRepository = buchungRepository;
         this.reservierungMapper = reservierungMapper;
+        this.kafkaResponseHandler = kafkaResponseHandler;
     }
 
-    /**
-     * Konsumiert eine Kafka-Nachricht, um alle Reservierungen abzurufen.
-     */
-    @KafkaListener(topics = "reservierung.getAll", groupId = "kino-group")
-    public List<ReservierungDTO> handleGetAllReservierungen() {
-        return reservierungRepository.findAll().stream()
-                .map(reservierungMapper::fromEntity)
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Konsumiert eine Kafka-Nachricht, um eine Reservierung nach ID abzurufen.
-     */
     @KafkaListener(topics = "reservierung.getById", groupId = "kino-group")
-    public ReservierungDTO handleGetReservierungById(Long reservierungsId) {
-        Reservierung reservierung = reservierungRepository.findById(reservierungsId)
-                .orElseThrow(() -> new RuntimeException("Reservierung nicht gefunden"));
-        return reservierungMapper.fromEntity(reservierung);
-    }
+    public void handleGetReservierungById(Map<String, Object> request) {
+        String requestId = (String) request.get("requestId");
+        Long reservierungsId = ((Number) request.get("data")).longValue();
 
-    /**
-     * Konsumiert eine Kafka-Nachricht, um eine neue Reservierung zu speichern.
-     */
-    @KafkaListener(topics = "reservierung.create", groupId = "kino-group")
-    public void handleCreateReservierung(ReservierungDTO reservierungDTO) {
-        Reservierung reservierung = reservierungMapper.toEntity(reservierungDTO);
-        reservierungRepository.save(reservierung);
-    }
-
-    /**
-     * Konsumiert eine Kafka-Nachricht, um eine Reservierung zu löschen.
-     */
-    @KafkaListener(topics = "reservierung.delete", groupId = "kino-group")
-    public void handleDeleteReservierung(Long reservierungsId) {
-        reservierungRepository.deleteById(reservierungsId);
-    }
-
-    /**
-     * Konvertiert eine Reservierung in eine Buchung.
-     */
-    @KafkaListener(topics = "reservierung.convert", groupId = "kino-group")
-    public void handleReservierungInBuchung(Long reservierungsId) {
         Reservierung reservierung = reservierungRepository.findById(reservierungsId)
                 .orElseThrow(() -> new RuntimeException("Reservierung nicht gefunden"));
 
-        Buchung buchung = reservierung.inBuchungUmwandeln();
+        ReservierungDTO reservierungDTO = reservierungMapper.fromEntity(reservierung);
 
-        // Speichert die Buchung statt der Reservierung
-        buchungRepository.save(buchung);
-
-        // Optional: Löscht die ursprüngliche Reservierung nach erfolgreicher Konvertierung
-        reservierungRepository.deleteById(reservierungsId);
+        kafkaResponseHandler.sendResponse(requestId, reservierungDTO);
     }
 
-    /**
-     * Holt eine Reservierung anhand der E-Mail-Adresse des Kunden.
-     */
-    @KafkaListener(topics = "reservierung.getByEmail", groupId = "kino-group")
-    public List<ReservierungDTO> handleGetReservierungByEmail(String email) {
-        List<Reservierung> reservierungen = reservierungRepository.findByEmail(email);
-        return reservierungen.stream()
+    @KafkaListener(topics = "reservierung.getAll", groupId = "kino-group")
+    public void handleGetAllReservierungen(Map<String, Object> request) {
+        String requestId = (String) request.get("requestId");
+
+        List<ReservierungDTO> reservierungen = reservierungRepository.findAll().stream()
                 .map(reservierungMapper::fromEntity)
                 .collect(Collectors.toList());
+
+        kafkaResponseHandler.sendResponse(requestId, reservierungen);
     }
 }
