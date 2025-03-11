@@ -1,62 +1,58 @@
 package com.kino.reservierungssystem.controller;
 
 import com.kino.reservierungssystem.dto.ReservierungDTO;
-import com.kino.reservierungssystem.exception.ReservierungAbgelaufenException;
-import com.kino.reservierungssystem.exception.UngueltigeBuchungException;
-import com.kino.reservierungssystem.model.Buchung;
-import com.kino.reservierungssystem.model.Reservierung;
-import com.kino.reservierungssystem.service.ReservierungService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import com.kino.reservierungssystem.kafka.request.KafkaRequestSender;
+import com.kino.reservierungssystem.kafka.response.KafkaResponseHandler;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/api/reservierungen")
 public class ReservierungController {
 
-    private final ReservierungService reservierungService;
+    private final KafkaRequestSender kafkaRequestSender;
+    private final KafkaResponseHandler kafkaResponseHandler;
 
-    public ReservierungController(ReservierungService reservierungService) {
-        this.reservierungService = reservierungService;
+    public ReservierungController(KafkaRequestSender kafkaRequestSender, KafkaResponseHandler kafkaResponseHandler) {
+        this.kafkaRequestSender = kafkaRequestSender;
+        this.kafkaResponseHandler = kafkaResponseHandler;
     }
 
     @GetMapping
-    public List<ReservierungDTO> getAllReservierungen() {
-        return reservierungService.getAllReservierungen();
+    public CompletableFuture<List<ReservierungDTO>> getAllReservierungen() {
+        String requestId = kafkaResponseHandler.generateRequestId();
+        kafkaRequestSender.sendRequest("reservierung.getAll", requestId, null);
+        return kafkaResponseHandler.getResponseList(requestId, ReservierungDTO.class);
     }
 
-    @GetMapping("/{kundeId}")
-    public ResponseEntity<List<Reservierung>> getReservierungenByKunde(@PathVariable Long kundeId) {
-        List<Reservierung> reservierungen = reservierungService.getReservierungenByKunde(kundeId);
-        return ResponseEntity.ok(reservierungen);
+    @GetMapping("/{id}")
+    public CompletableFuture<ReservierungDTO> getReservierungById(@PathVariable Long id) {
+        String requestId = kafkaResponseHandler.generateRequestId();
+        kafkaRequestSender.sendRequest("reservierung.getById", requestId, id);
+        return kafkaResponseHandler.getSingleResponse(requestId, ReservierungDTO.class);
     }
 
     @PostMapping
-    public ResponseEntity<Reservierung> createReservierung(@RequestBody Reservierung reservierung) {
-        Reservierung savedReservierung = reservierungService.saveReservierung(reservierung);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedReservierung);
+    public void createReservierung(@RequestBody ReservierungDTO reservierungDTO) {
+        kafkaRequestSender.sendRequest("reservierung.create", null, reservierungDTO);
     }
 
-    /**
-     * Endpoint, um eine bestehende Reservierung in eine Buchung umzuwandeln.
-     */
     @PutMapping("/{reservierungsId}/buchen")
-    public ResponseEntity<Buchung> convertReservierungToBuchung(@PathVariable Long reservierungsId) {
-        try {
-            Buchung buchung = reservierungService.convertToBuchung(reservierungsId);
-            return ResponseEntity.ok(buchung);
-        } catch (ReservierungAbgelaufenException | UngueltigeBuchungException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
-        }
+    public void convertReservierungToBuchung(@PathVariable Long reservierungsId) {
+        kafkaRequestSender.sendRequest("reservierung.convert", null, reservierungsId);
     }
 
-    /**
-     * Endpoint, um eine Reservierung zu stornieren.
-     */
     @DeleteMapping("/{reservierungsId}")
-    public ResponseEntity<Void> cancelReservierung(@PathVariable Long reservierungsId) {
-        reservierungService.cancelReservierung(reservierungsId);
-        return ResponseEntity.noContent().build();
+    public void cancelReservierung(@PathVariable Long reservierungsId) {
+        kafkaRequestSender.sendRequest("reservierung.cancel", null, reservierungsId);
+    }
+
+    @GetMapping("/email/{email}")
+    public CompletableFuture<List<ReservierungDTO>> getReservierungenByEmail(@PathVariable String email) {
+        String requestId = kafkaResponseHandler.generateRequestId();
+        kafkaRequestSender.sendRequest("reservierung.findByEmail", requestId, email);
+        return kafkaResponseHandler.getResponseList(requestId,  ReservierungDTO.class);
     }
 }

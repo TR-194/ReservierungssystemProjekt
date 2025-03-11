@@ -2,6 +2,7 @@ package com.kino.reservierungssystem.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.util.concurrent.locks.ReentrantLock;
 
 @Entity
@@ -18,24 +19,14 @@ public class Sitzplatz {
     private int platzNr;
 
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private Status status; // Enum for "frei", "reserviert", "gebucht"
 
-    @ManyToOne
-    @JoinColumn(name = "sitzreihe_id")
-    private Sitzreihe sitzreihe;
+    private Long auffuehrungId;  // Reference to Aufführung
+    private Long kategorieId; // Reference to Sitzkategorie
 
-    @ManyToOne
-    private Reservierung reservierung;
+    @Version // Optimistic Locking
+    private int version;
 
-    @ManyToOne
-    private Buchung buchung;
-
-    // Transienter Lock zur Steuerung von Konkurrenzzugriffen – wird nicht in die DB geschrieben
     @Transient
     private final ReentrantLock lock = new ReentrantLock();
-
-    // Getter für den Lock
-    public ReentrantLock getLock() {
-        return lock;
-    }
 }

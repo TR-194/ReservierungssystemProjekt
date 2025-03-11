@@ -1,10 +1,10 @@
 package com.kino.reservierungssystem.model;
 
 import jakarta.persistence.*;
+import lombok.*;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
-import lombok.*;
 
 @Entity
 @Getter
@@ -19,42 +19,11 @@ public class Auffuehrung {
 
     private LocalDate datum;
     private LocalTime uhrzeit;
+    private Long filmId;  // Kafka sendet nur die Film-ID
+    private Long kinosaalId; // Kafka sendet nur die Saal-ID
 
-    @ManyToOne
-    @JoinColumn(name = "film_id")
-    private Film film;
+    @Version // Optimistisches Locking
+    private int version;
 
-    @ManyToOne
-    @JoinColumn(name = "kinosaal_id")
-    private Kinosaal kinosaal;
 
-    @OneToMany(mappedBy = "auffuehrung")
-    private List<Reservierung> reservierungen;
-
-    @OneToMany(mappedBy = "auffuehrung")
-    private List<Buchung> buchungen;
-
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "preismodell_id", referencedColumnName = "id")
-    private Preismodell preismodell;
-
-    /**
-     * Prüft, ob in einem der Sitzreihen des Kinosaals mindestens ein Sitzplatz FREI ist.
-     *
-     * @return true, wenn ein freier Sitzplatz vorhanden ist, sonst false.
-     */
-    public boolean istVerfuegbar() {
-        if (kinosaal != null && kinosaal.getSitzreihen() != null) {
-            for (Sitzreihe reihe : kinosaal.getSitzreihen()) {
-                if (reihe.getSitzplaetze() != null) {
-                    for (Sitzplatz platz : reihe.getSitzplaetze()) {
-                        if (platz.getStatus() == Status.FREI) {
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-        return false;
-    }
 }

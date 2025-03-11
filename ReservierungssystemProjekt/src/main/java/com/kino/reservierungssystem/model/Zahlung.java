@@ -1,8 +1,9 @@
 package com.kino.reservierungssystem.model;
 
 import jakarta.persistence.*;
-import java.time.LocalDate;
 import lombok.*;
+
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -17,18 +18,12 @@ public class Zahlung {
 
     private double betrag;
     private LocalDate zahlungsdatum;
+    private Long buchungId; // Zugehörige Buchungs-ID
 
-    @OneToOne
-    @JoinColumn(name = "buchung_id")
-    private Buchung buchung;
+    @Version // Optimistisches Locking
+    private int version;
 
-    /**
-     * Simuliert die Zahlungsvalidierung. Da es sich um eine Online-Zahlung handelt,
-     * wird hier immer true zurückgegeben.
-     *
-     * @return true, wenn die Zahlung validiert wurde (immer true in dieser Simulation)
-     */
     public boolean verarbeiten() {
-        return true;
+        return true; // Simulierte Online-Zahlung
     }
 }

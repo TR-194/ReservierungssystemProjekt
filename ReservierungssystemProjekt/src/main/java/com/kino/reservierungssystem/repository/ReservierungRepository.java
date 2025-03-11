@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface ReservierungRepository extends JpaRepository<Reservierung, Long> {
     List<Reservierung> findByKundeId(Long kundeId);
+
+    List<Reservierung> findByEmail(String email);
 }
