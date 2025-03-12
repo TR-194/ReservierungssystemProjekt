@@ -42,6 +42,7 @@ public class KafkaRequestHandler {
         for(Auffuehrung auffuehrung : auffuehrungen){
             AuffuehrungDTO dto = new AuffuehrungDTO(auffuehrung.getId(), auffuehrung.getDatum(), auffuehrung.getUhrzeit(), auffuehrung.getFilmId(),
                     auffuehrung.getSaalId(), preismodelle.stream().filter(preismodell -> preismodell.getId() == auffuehrung.getPreismodellId()).findFirst().orElse(null));
+            dtos.add(dto);
         }
         responseSender.sendResponse("kino.response", requestId, dtos);
     }
@@ -73,7 +74,12 @@ public class KafkaRequestHandler {
     public  void handleFilmGetAllRequest(Map<String, Object> request) {
         String requestId = (String) request.get("requestId");
         List<Film> filme = dbAccess.GetAllFilme();
-        responseSender.sendResponse("kino.response", requestId, filme);
+        List<FilmDTO> dtos = new ArrayList<FilmDTO>();
+        for (Film film : filme) {
+            FilmDTO filmDTO = new FilmDTO(film.getId(), film.getName(), film.getAlterbeschraenkung(), film.getDauer());
+            dtos.add(filmDTO);
+        }
+        responseSender.sendResponse("kino.response", requestId, dtos);
     }
 
     @KafkaListener(topics = "kino.film.create", groupId = "kino-group")
@@ -124,6 +130,11 @@ public class KafkaRequestHandler {
         public void handleSitzplatzGetAllRequest(Map<String, Object> request){
         String requestId = (String) request.get("requestId");
         List<Platz> plaetze = dbAccess.GetAllPlaetze();
-        responseSender.sendResponse("kino.response", requestId, plaetze);
+        List<SitzplatzDTO> dtos = new ArrayList<SitzplatzDTO>();
+        for (Platz platz : plaetze) {
+            SitzplatzDTO dto = new SitzplatzDTO(platz.getId(), platz.getNr(), platz.getReiheId());
+            dtos.add(dto);
+        }
+        responseSender.sendResponse("kino.response", requestId, dtos);
     }
 }
