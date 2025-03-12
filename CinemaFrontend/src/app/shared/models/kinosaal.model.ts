@@ -1,8 +1,6 @@
-import { Sitzreihe } from "./sitzreihe.model";
-
 export interface Kinosaal {
   id: number;
   name: string;
   freigegeben: boolean;
-  sitzreihen: Sitzreihe[];
+  sitzreihenIds: number[];  // Liste der Sitzreihen-IDs (Entkopplung)
 }

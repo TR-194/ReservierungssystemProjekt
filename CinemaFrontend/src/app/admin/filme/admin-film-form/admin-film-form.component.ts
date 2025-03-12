@@ -1,25 +1,23 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { FilmService } from 'src/app/shared/services/film.service';
+import { KafkaService } from 'src/app/shared/services/kafka.service';
 import { Film } from 'src/app/shared/models/film.model';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-admin-film-form',
-    imports: [
-      CommonModule,
-      FormsModule
-    ],
+  standalone: true,
+  imports: [CommonModule, FormsModule],
   templateUrl: './admin-film-form.component.html',
   styleUrls: ['./admin-film-form.component.css']
 })
 export class AdminFilmFormComponent implements OnInit {
-  film: Film = { id: 0, titel: '', genre: '', dauer: 0, fsk: 0 };
+  film: Film = { id: 0, titel: '', dauer: 0, fsk: 0 };
   filmId?: number;
 
   constructor(
-    private filmService: FilmService,
+    private kafkaService: KafkaService,
     private route: ActivatedRoute,
     private router: Router
   ) {}
@@ -27,7 +25,7 @@ export class AdminFilmFormComponent implements OnInit {
   ngOnInit(): void {
     this.filmId = this.route.snapshot.params['id'];
     if (this.filmId) {
-      this.filmService.getFilmById(this.filmId).subscribe(
+      this.kafkaService.sendRequest<Film>('film.getById', this.filmId).subscribe(
         (data: Film) => this.film = data,
         error => console.error('Fehler beim Laden des Films', error)
       );
@@ -36,12 +34,12 @@ export class AdminFilmFormComponent implements OnInit {
 
   speichereFilm(): void {
     if (this.filmId) {
-      this.filmService.bearbeiteFilm(this.filmId, this.film).subscribe(
+      this.kafkaService.sendRequest<void>('film.update', this.film).subscribe(
         () => this.router.navigate(['/admin/filme']),
         error => console.error('Fehler beim Aktualisieren des Films', error)
       );
     } else {
-      this.filmService.erstelleFilm(this.film).subscribe(
+      this.kafkaService.sendRequest<void>('film.create', this.film).subscribe(
         () => this.router.navigate(['/admin/filme']),
         error => console.error('Fehler beim Erstellen des Films', error)
       );

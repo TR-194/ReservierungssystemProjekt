@@ -1,12 +1,8 @@
-import { Film } from './film.model';
-import { Kinosaal } from './kinosaal.model';
-import { Preismodell } from './preismodell.model';
-
 export interface Auffuehrung {
   id: number;
   datum: string;  // ISO-Format: YYYY-MM-DD
   uhrzeit: string; // HH:MM
-  film: Film;
-  kinosaal: Kinosaal;
-  preismodell: Preismodell; // Add Preismodell
+  filmId: number;  // Referenz zur Film-ID statt vollständigem Objekt
+  kinosaalId: number;  // Referenz zur Kinosaal-ID
+  preismodellId: number; // Falls Preismodell separat gespeichert wird
 }

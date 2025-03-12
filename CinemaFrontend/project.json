@@ -8,12 +8,12 @@
   "tags": [],
   "targets": {
     "build": {
-      "executor": "@angular-devkit/build-angular:application",
+      "executor": "@nx/angular:webpack-browser",
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/CinemaFrontend",
         "index": "./src/index.html",
-        "browser": "./src/main.ts",
+        "main": "./src/main.ts",
         "polyfills": ["zone.js"],
         "tsConfig": "tsconfig.app.json",
         "assets": [
@@ -23,7 +23,10 @@
           }
         ],
         "styles": ["./src/styles.css"],
-        "scripts": []
+        "scripts": [],
+        "customWebpackConfig": {
+          "path": "webpack.config.js"
+        }
       },
       "configurations": {
         "production": {
