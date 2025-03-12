@@ -16,6 +16,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws/kafka").setAllowedOrigins("*").withSockJS();
+        registry.addEndpoint("/ws/kafka")
+                .setAllowedOrigins("http://localhost:4200")  // CORS für Angular erlauben
+                .withSockJS();
     }
 }
