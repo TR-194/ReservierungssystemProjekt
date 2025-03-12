@@ -1,12 +1,15 @@
 package com.kino.reservierungssystem.dto;
 
-import lombok.Data;
-import java.util.Date;
+import java.time.LocalDate;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class ZahlungDTO {
     private Long id;
-    private Long buchungId;
-    private Double betrag;
-    private Date zahlungsdatum;
+    private double betrag;
+    private LocalDate zahlungsdatum;
+    private Long buchungId;  // <-- Make sure this field exists
 }

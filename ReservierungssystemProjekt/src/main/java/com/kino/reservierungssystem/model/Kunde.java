@@ -1,7 +1,6 @@
 package com.kino.reservierungssystem.model;
 
 import jakarta.persistence.*;
-import java.util.List;
 import lombok.*;
 
 @Entity
@@ -18,11 +17,6 @@ public class Kunde {
     private String name;
     private String email;
 
-    @OneToMany(mappedBy = "kunde")
-    private List<Reservierung> reservierungen;
-
-    @OneToMany(mappedBy = "kunde")
-    private List<Buchung> buchungen;
-
-    // Getter & Setter
+    @Version // Optimistisches Locking
+    private int version;
 }

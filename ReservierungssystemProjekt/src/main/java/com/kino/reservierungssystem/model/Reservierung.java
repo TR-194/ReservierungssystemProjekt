@@ -1,9 +1,9 @@
 package com.kino.reservierungssystem.model;
 
 import jakarta.persistence.*;
-import java.time.LocalDate;
-import java.util.List;
 import lombok.*;
+
+import java.util.List;
 
 @Entity
 @Getter
@@ -16,23 +16,30 @@ public class Reservierung {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LocalDate ablaufDatum;
+    private String name;
+    private String email;
 
     @ManyToOne
-    @JoinColumn(name = "kunde_id")
-    private Kunde kunde;
-
-    @ManyToOne
-    @JoinColumn(name = "auffuehrung_id")
+    @JoinColumn(name = "auffuehrung_id", nullable = false)
     private Auffuehrung auffuehrung;
 
-    @OneToMany(mappedBy = "reservierung")
-    private List<Sitzplatz> sitzplaetze;
+    @ElementCollection
+    private List<Long> sitzplatzIds; // Sitzplätze als ID-Referenzen
 
+    private String status; // "Reserviert", "Gebucht"
 
-    public boolean istGueltig() {
-        return LocalDate.now().isBefore(ablaufDatum);
+    /**
+     * Wandelt eine Reservierung in eine Buchung um.
+     *
+     * @return eine neue Buchung basierend auf dieser Reservierung.
+     */
+    public Buchung inBuchungUmwandeln() {
+        Buchung buchung = new Buchung();
+        buchung.setName(this.name);
+        buchung.setEmail(this.email);
+        buchung.setAuffuehrung(this.auffuehrung);
+        buchung.setSitzplatzIds(this.sitzplatzIds);
+        buchung.setStatus("Gebucht"); // Setzt den Status auf "Gebucht"
+        return buchung;
     }
-
-    // Getter & Setter
 }

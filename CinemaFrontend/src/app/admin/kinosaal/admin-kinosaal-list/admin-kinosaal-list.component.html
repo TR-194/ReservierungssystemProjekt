@@ -1,0 +1,33 @@
+<div class="container">
+  <h2>Kinosaal Verwaltung</h2>
+
+  <div *ngIf="errorMessage" class="error-message">
+    {{ errorMessage }}
+  </div>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Freigegeben</th>
+        <th>Aktionen</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let saal of kinosaele">
+        <td>{{ saal.id }}</td>
+        <td>{{ saal.name }}</td>
+        <td>{{ saal.freigegeben ? 'Ja' : 'Nein' }}</td>
+        <td>
+          <button (click)="loescheKinosaal(saal.id)">Löschen</button>
+          <button (click)="toggleFreigabe(saal.id)">
+            {{ saal.freigegeben ? 'Sperren' : 'Freigeben' }}
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <button (click)="navigateTo('/admin/kinosaal/neuerSaal')">Neuen Kinosaal hinzufügen</button>
+</div>

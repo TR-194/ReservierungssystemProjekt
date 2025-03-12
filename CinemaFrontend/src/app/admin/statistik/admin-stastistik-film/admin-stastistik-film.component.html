@@ -1,0 +1,11 @@
+<h2>Einnahmen pro Film</h2>
+<table>
+  <tr>
+    <th>Film</th>
+    <th>Einnahmen (€)</th>
+  </tr>
+  <tr *ngFor="let film of filmeStatistik">
+    <td>{{ film.titel }}</td>
+    <td>{{ film.einnahmen | currency:'EUR' }}</td>
+  </tr>
+</table>

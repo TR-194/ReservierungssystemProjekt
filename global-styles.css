@@ -1,0 +1,7 @@
+body {
+    font-family: 'Arial, sans-serif'; /* Change this to your desired font */
+    font-size: 16px; /* Adjust the base font size if needed */
+    line-height: 1.5; /* Adjust the line height for better readability */
+    color: #333; /* Set a default text color */
+    background-color: #f9f9f9; /* Set a default background color */
+}

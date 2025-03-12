@@ -1,0 +1,43 @@
+h2 {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.film-list {
+    background-color: #222;
+    color: white;
+    padding: 20px;
+    margin: 20px auto;
+    width: 50%;
+    border-radius: 8px;
+}
+
+.film-list ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.film-list li {
+    margin: 10px 0;
+    padding: 10px;
+    background-color: #333;
+    border-radius: 4px;
+}
+
+.film-list button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 10px;
+    transition: background-color 0.3s;
+}
+
+.film-list button:hover {
+    background-color: #0056b3;
+}

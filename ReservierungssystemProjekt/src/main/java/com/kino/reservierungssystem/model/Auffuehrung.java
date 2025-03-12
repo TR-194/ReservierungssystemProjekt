@@ -1,10 +1,10 @@
 package com.kino.reservierungssystem.model;
 
 import jakarta.persistence.*;
+import lombok.*;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
-import lombok.*;
 
 @Entity
 @Getter
@@ -19,21 +19,11 @@ public class Auffuehrung {
 
     private LocalDate datum;
     private LocalTime uhrzeit;
+    private Long filmId;  // Kafka sendet nur die Film-ID
+    private Long kinosaalId; // Kafka sendet nur die Saal-ID
 
-    @ManyToOne
-    @JoinColumn(name = "film_id")
-    private Film film;
-
-    @ManyToOne
-    @JoinColumn(name = "kinosaal_id")
-    private Kinosaal kinosaal;
-
-    @OneToMany(mappedBy = "auffuehrung")
-    private List<Reservierung> reservierungen;
-
-    @OneToMany(mappedBy = "auffuehrung")
-    private List<Buchung> buchungen;
+    @Version // Optimistisches Locking
+    private int version;
 
 
-    // Getter & Setter
 }

@@ -1,7 +1,6 @@
 package com.kino.reservierungssystem.model;
 
 import jakarta.persistence.*;
-import java.util.List;
 import lombok.*;
 
 @Entity
@@ -9,6 +8,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Film {
 
     @Id
@@ -19,8 +19,6 @@ public class Film {
     private String alterbeschraenkung;
     private int dauer;
 
-    @OneToMany(mappedBy = "film")
-    private List<Auffuehrung> auffuehrungen;
-
-    // Getter & Setter
+    @Version // Optimistisches Locking
+    private int version;
 }

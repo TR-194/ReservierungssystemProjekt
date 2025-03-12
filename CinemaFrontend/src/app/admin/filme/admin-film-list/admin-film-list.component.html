@@ -1,0 +1,11 @@
+<div class="film-list">
+  <h2>Filme</h2>
+  <ul>
+    <li *ngFor="let film of filme">
+      {{ film.titel }} ({{ film.genre }}, {{ film.dauer }} Min)
+      <button (click)="bearbeiteFilm(film.id)">Bearbeiten</button>
+      <button (click)="loescheFilm(film.id)">Löschen</button>
+    </li>
+  </ul>
+  <button (click)="erstelleNeuenFilm()">Neuen Film hinzufügen</button>
+</div>

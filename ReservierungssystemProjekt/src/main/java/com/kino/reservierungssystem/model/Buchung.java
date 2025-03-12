@@ -1,8 +1,9 @@
 package com.kino.reservierungssystem.model;
 
 import jakarta.persistence.*;
-import java.util.List;
 import lombok.*;
+
+import java.util.List;
 
 @Entity
 @Getter
@@ -15,23 +16,15 @@ public class Buchung {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "kunde_id")
-    private Kunde kunde;
+    private String name;
+    private String email;
 
     @ManyToOne
-    @JoinColumn(name = "auffuehrung_id")
+    @JoinColumn(name = "auffuehrung_id", nullable = false)
     private Auffuehrung auffuehrung;
 
-    @OneToMany(mappedBy = "buchung")
-    private List<Sitzplatz> sitzplaetze;
+    @ElementCollection
+    private List<Long> sitzplatzIds; // Sitzplätze als ID-Referenzen
 
-    @OneToOne(mappedBy = "buchung")
-    private Zahlung zahlung;
-
-    public void bezahlen() {
-        // Logik für Zahlung
-    }
-
-    // Getter & Setter
+    private String status; // "Gebucht"
 }
