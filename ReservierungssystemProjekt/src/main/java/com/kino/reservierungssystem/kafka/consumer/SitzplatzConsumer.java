@@ -32,4 +32,22 @@ public class SitzplatzConsumer {
         String requestId = (String) request.get("requestId");
         kafkaResponseHandler.sendResponse(requestId, request.get("data"));
     }
+
+    @KafkaListener(topics = "sitzplatz.getByAuffuehrung", groupId = "kino-group")
+    public void handleSitzplaetzeByAuffuehrung(Map<String, Object> request) {
+        String requestId = (String) request.get("requestId");
+        kafkaResponseHandler.sendResponse(requestId, request.get("data"));
+    }
+
+    @KafkaListener(topics = "sitzplatz.getByKinosaal", groupId = "kino-group")
+    public void handleSitzplaetzeByKinosaal(Map<String, Object> request) {
+        String requestId = (String) request.get("requestId");
+        kafkaResponseHandler.sendResponse(requestId, request.get("data"));
+    }
+
+    @KafkaListener(topics = "sitzplatz.getVerfügbare", groupId = "kino-group")
+    public void handleVerfuegbareSitzplaetze(Map<String, Object> request) {
+        String requestId = (String) request.get("requestId");
+        kafkaResponseHandler.sendResponse(requestId, request.get("data"));
+    }
 }

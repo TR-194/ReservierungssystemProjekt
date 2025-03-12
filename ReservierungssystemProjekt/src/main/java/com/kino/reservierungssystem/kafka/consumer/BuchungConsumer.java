@@ -20,7 +20,7 @@ public class BuchungConsumer {
         this.kafkaResponseHandler = kafkaResponseHandler;
     }
 
-    @KafkaListener(topics = "kino.buchung.getAll", groupId = "kino-group")
+    @KafkaListener(topics = "buchung.getAll", groupId = "kino-group")
     public void handleBuchungAnfrage(Map<String, Object> request) {
         String requestId = (String) request.get("requestId");
         List<BuchungDTO> buchungen = kafkaRequestSender.sendRequest(
@@ -28,7 +28,7 @@ public class BuchungConsumer {
         kafkaResponseHandler.sendResponse(requestId, buchungen);
     }
 
-    @KafkaListener(topics = "kino.buchung.getById", groupId = "kino-group")
+    @KafkaListener(topics = "buchung.getById", groupId = "kino-group")
     public void handleBuchungByIdAnfrage(Map<String, Object> request) {
         String requestId = (String) request.get("requestId");
         Long id = ((Number) request.get("data")).longValue();
@@ -38,13 +38,13 @@ public class BuchungConsumer {
         kafkaResponseHandler.sendResponse(requestId, buchung);
     }
 
-    @KafkaListener(topics = "kino.buchung.create", groupId = "kino-group")
+    @KafkaListener(topics = "buchung.create", groupId = "kino-group")
     public void handleBuchungErstellt(Map<String, Object> request) {
         BuchungDTO buchungDTO = (BuchungDTO) request.get("data");
         kafkaRequestSender.sendRequest("db.buchung.create", buchungDTO, Void.class);
     }
 
-    @KafkaListener(topics = "kino.buchung.delete", groupId = "kino-group")
+    @KafkaListener(topics = "buchung.delete", groupId = "kino-group")
     public void handleBuchungGeloescht(Map<String, Object> request) {
         Long id = ((Number) request.get("data")).longValue();
         kafkaRequestSender.sendRequest("db.buchung.delete", id, Void.class);

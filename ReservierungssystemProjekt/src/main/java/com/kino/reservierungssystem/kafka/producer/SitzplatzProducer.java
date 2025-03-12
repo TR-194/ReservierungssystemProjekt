@@ -33,4 +33,17 @@ public class SitzplatzProducer {
     public void sendSitzplatzStatusUpdate(String requestId, SitzplatzDTO sitzplatzDTO) {
         kafkaTemplate.send("sitzplatz.updateStatus", requestId, sitzplatzDTO);
     }
+
+    public void sendVerfuegbareSitzplaetze() {
+        kafkaTemplate.send("sitzplatz.getVerfügbare", null);
+    }
+
+    public void sendSitzplaetzeByAuffuehrung(Long auffuehrungId) {
+        kafkaTemplate.send("sitzplatz.getByAuffuehrung", auffuehrungId);
+    }
+
+    public void sendSitzplaetzeByKinosaal(Long kinosaalId) {
+        kafkaTemplate.send("sitzplatz.getByKinosaal", kinosaalId);
+    }
 }
+
