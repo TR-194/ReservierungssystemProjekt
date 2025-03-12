@@ -4,6 +4,9 @@ import com.kino.reservierungssystem.dto.ReservierungDTO;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+import java.util.UUID;
+
 @Component
 public class ReservierungProducer {
 
@@ -22,7 +25,12 @@ public class ReservierungProducer {
     }
 
     public void sendReservierungUmgewandelt(Long reservierungsId) {
-        kafkaTemplate.send("reservierung.convert", reservierungsId);
+        String requestId = UUID.randomUUID().toString();
+        Map<String, Object> message = Map.of(
+                "requestId", requestId,
+                "reservierungsId", reservierungsId
+        );
+        kafkaTemplate.send("reservierung.convert", message);
     }
 
     public void sendReservierungByEmail(String email) {

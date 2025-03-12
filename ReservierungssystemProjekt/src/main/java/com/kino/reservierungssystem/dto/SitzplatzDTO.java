@@ -14,6 +14,5 @@ public class SitzplatzDTO implements Serializable {
     private Long id;
     private int nummer;
     private String status; // "frei", "reserviert", "gebucht"
-    private Long auffuehrungId; // Zugehörige Aufführung
-    private Long kategorieId; // Sitzplatz hat eine Kategorie
+    private Long SitzreiheId;
 }

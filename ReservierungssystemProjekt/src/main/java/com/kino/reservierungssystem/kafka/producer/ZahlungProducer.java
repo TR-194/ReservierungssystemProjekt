@@ -1,5 +1,6 @@
 package com.kino.reservierungssystem.kafka.producer;
 
+import com.kino.reservierungssystem.dto.ZahlungDTO;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -12,17 +13,15 @@ public class ZahlungProducer {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    /**
-     * Sendet eine Anfrage zur Erstellung einer Zahlung.
-     */
-    public void sendZahlungErstellt(String requestId, Object zahlungDTO) {
-        kafkaTemplate.send("zahlung.create", requestId, zahlungDTO);
-    }
 
     /**
      * Sendet eine Anfrage zum Abruf einer Zahlung für eine Buchung.
      */
     public void sendZahlungByBuchungIdAnfrage(String requestId, Long buchungId) {
         kafkaTemplate.send("zahlung.getByBuchungId", requestId, buchungId);
+    }
+
+    public void sendZahlungErstellt(ZahlungDTO zahlungDTO) {
+        kafkaTemplate.send("zahlung.create", zahlungDTO);
     }
 }
