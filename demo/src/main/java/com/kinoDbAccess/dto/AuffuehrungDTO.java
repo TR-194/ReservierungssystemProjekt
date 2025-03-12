@@ -10,7 +10,6 @@ import java.time.LocalTime;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AuffuehrungDTO {
     public Long id;
