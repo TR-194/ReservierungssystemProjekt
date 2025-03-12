@@ -31,13 +31,13 @@ public class DbAccess {
     private JdbcTemplate template;
 
     public void InsertSaal(Saal saal) {
-        String sql = "INSERT INTO saele (name) values (?);";
-        template.update(sql, saal.getName());
+        String sql = "INSERT INTO saele (name, freigegeben) values (?, ?);";
+        template.update(sql, saal.getName(), saal.isFreigegeben());
     }
 
     public List<Saal> GetAllSaele() {
         String sql = "SELECT * FROM saele";
-        return template.query(sql, (rs, rowNum) -> new Saal(rs.getLong("id"), rs.getString("name")));
+        return template.query(sql, (rs, rowNum) -> new Saal(rs.getLong("id"), rs.getBoolean("freigegeben"), rs.getString("name")));
     }
 
     public void InsertReihe(Reihe reihe) {
@@ -47,7 +47,7 @@ public class DbAccess {
 
     public List<Reihe> GetAllReihen() {
         String sql = "SELECT * FROM reihen";
-        return template.query(sql, (rs, rowNum) -> new Reihe(rs.getLong("id"), rs.getInt("nr"), rs.getLong("saalId")));
+        return template.query(sql, (rs, rowNum) -> new Reihe(rs.getLong("id"), rs.getInt("nr"), rs.getLong("saalId"), Kategorie.valueOf(rs.getString("kategorie"))));
     }
 
     public void InsertPlatz(Platz platz) {
@@ -57,7 +57,7 @@ public class DbAccess {
 
     public List<Platz> GetAllPlaetze() {
         String sql = "SELECT * FROM reihen";
-        return template.query(sql, (rs, rowNum) -> new Platz(rs.getInt("id"), rs.getInt("nr"), rs.getInt("reiheId")));
+        return template.query(sql, (rs, rowNum) -> new Platz(rs.getLong("id"), rs.getInt("nr"), (long)rs.getLong("reiheId")));
     }
 
     public void InsertFilm(Film film) {

@@ -9,6 +9,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -36,7 +37,13 @@ public class KafkaRequestHandler {
     public void handleAuffuehrungGetAllRequest(Map<String, Object> request) {
         String requestId = (String) request.get("requestId");
         List<Auffuehrung> auffuehrungen = dbAccess.GetAllAuffuehrungen();
-        responseSender.sendResponse("kino.response", requestId, auffuehrungen);
+        List<Preismodell> preismodelle = dbAccess.GetAllPreismodelle();
+        List<AuffuehrungDTO> dtos = new ArrayList<AuffuehrungDTO>();
+        for(Auffuehrung auffuehrung : auffuehrungen){
+            AuffuehrungDTO dto = new AuffuehrungDTO(auffuehrung.getId(), auffuehrung.getDatum(), auffuehrung.getUhrzeit(), auffuehrung.getFilmId(),
+                    auffuehrung.getSaalId(), preismodelle.stream().filter(preismodell -> preismodell.getId() == auffuehrung.getPreismodellId()).findFirst().orElse(null));
+        }
+        responseSender.sendResponse("kino.response", requestId, dtos);
     }
 
     @KafkaListener(topics = "kino.auffuehrung.create", groupId = "kino-group")
@@ -78,14 +85,15 @@ public class KafkaRequestHandler {
     @KafkaListener(topics = "kinosaal.create", groupId = "kino-group")
     public void handleSaalCreateRequest(Map<String, Object> request) {
         KinosaalDTO kinosaal = ((KinosaalDTO) request.get("kinosaalDTO"));
-        Saal saal = new Saal(kinosaal.getName());
+        Saal saal = new Saal(kinosaal.isFreigegeben(), kinosaal.getName());
         try{
             long saalId = dbAccess.InsertSaalAndGetId(saal);
             for(SitzreiheDTO sitzreiheDTO : kinosaal.getSitzreihen()){
-                Reihe reihe = new Reihe(sitzreiheDTO.getReihenNummer(), saalId);
+                Reihe reihe = new Reihe(sitzreiheDTO.getReihenNummer(), saalId, sitzreiheDTO.getKategorie());
                 long reiheId = dbAccess.InsertReiheAndGetId(reihe);
                 for (SitzplatzDTO sitzplatzDTO : sitzreiheDTO.getSitzplaetze()){
-                    //hier die Sitzplätze einfügen?
+                    Platz platz = new Platz(sitzplatzDTO.getNummer(), reiheId);
+                    dbAccess.InsertPlatz(platz);
                 }
             }
         } catch (Exception ex) {

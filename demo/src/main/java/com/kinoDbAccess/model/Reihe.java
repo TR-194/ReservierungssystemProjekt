@@ -5,15 +5,27 @@ public class Reihe {
     private int nr;
     private Long saalId;
 
-    public Reihe(Long id, int nr, Long saalId) {
+    public Kategorie getKategorie() {
+        return kategorie;
+    }
+
+    public void setKategorie(Kategorie kategorie) {
+        this.kategorie = kategorie;
+    }
+
+    private Kategorie kategorie;
+
+    public Reihe(Long id, int nr, Long saalId, Kategorie kategorie) {
         this.id = id;
         this.nr = nr;
         this.saalId = saalId;
+        this.kategorie = kategorie;
     }
 
-    public Reihe(int nr, Long saalId) {
+    public Reihe(int nr, Long saalId, Kategorie kategorie) {
         this.nr = nr;
         this.saalId = saalId;
+        this.kategorie = kategorie;
     }
 
     public Long getId() {

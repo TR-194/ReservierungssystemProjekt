@@ -20,4 +20,13 @@ public class AuffuehrungDTO {
     public Long kinosaalId;
 
     public Preismodell preismodell;
+
+    public AuffuehrungDTO(Long id, LocalDate datum, LocalTime uhrzeit, Long filmId, Long kinosaalId, Preismodell preismodell) {
+        this.id = id;
+        this.datum = datum;
+        this.uhrzeit = uhrzeit;
+        this.filmId = filmId;
+        this.kinosaalId = kinosaalId;
+        this.preismodell = preismodell;
+    }
 }

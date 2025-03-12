@@ -1,26 +1,26 @@
 package com.kinoDbAccess.model;
 
 public class Platz {
-    private int id;
+    private Long id;
     private int nr;
-    private int reiheId;
+    private Long reiheId;
 
-    public Platz(int id, int nr, int reiheId) {
+    public Platz(Long id, int nr, Long reiheId) {
         this.id = id;
         this.nr = nr;
         this.reiheId = reiheId;
     }
 
-    public Platz(int nr, int reiheId) {
+    public Platz(int nr, Long reiheId) {
         this.nr = nr;
         this.reiheId = reiheId;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -32,11 +32,11 @@ public class Platz {
         this.nr = nr;
     }
 
-    public int getReiheId() {
+    public Long getReiheId() {
         return reiheId;
     }
 
-    public void setReiheId(int reiheId) {
+    public void setReiheId(Long reiheId) {
         this.reiheId = reiheId;
     }
 
