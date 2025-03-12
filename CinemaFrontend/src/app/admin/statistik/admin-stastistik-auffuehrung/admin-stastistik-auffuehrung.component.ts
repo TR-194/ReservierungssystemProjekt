@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { AuffuehrungStatistikService } from 'src/app/shared/services/auffuehrung-statistik.service';
+import { KafkaService } from 'src/app/shared/services/kafka.service';
 
 interface AuffuehrungStatistik {
   id: number;
@@ -17,11 +17,17 @@ interface AuffuehrungStatistik {
 export class AdminStatistikAuffuehrungComponent implements OnInit {
   auffuehrungenStatistik: AuffuehrungStatistik[] = [];
 
-  constructor(private auffuehrungStatistikService: AuffuehrungStatistikService) {}
+  constructor(private kafkaService: KafkaService) {}
 
   ngOnInit(): void {
-    this.auffuehrungStatistikService.getAuffuehrungStatistik().subscribe(data => {
-      this.auffuehrungenStatistik = data;
-    });
+    this.ladeAuffuehrungsStatistik();
+  }
+
+  ladeAuffuehrungsStatistik(): void {
+    this.kafkaService.sendRequest<AuffuehrungStatistik[]>('statistik.getEinnahmenProAuffuehrung')
+      .subscribe(
+        data => this.auffuehrungenStatistik = data,
+        error => console.error('Fehler beim Laden der Aufführungsstatistik:', error)
+      );
   }
 }

@@ -1,13 +1,11 @@
 <form [formGroup]="buchungForm" (ngSubmit)="onSubmit()">
-    <label for="name">Name:</label>
-    <input id="name" formControlName="name" required />
-  
-    <label for="email">E-Mail:</label>
-    <input id="email" formControlName="email" type="email" required />
-  
-    <label for="sitzplaetze">Sitzplätze:</label>
-    <input id="sitzplaetze" formControlName="sitzplaetze" required />
-  
-    <button type="submit" [disabled]="buchungForm.invalid">Buchen</button>
-  </form>
-  
+  <label for="name">Name:</label>
+  <input id="name" formControlName="name" required />
+
+  <label for="email">E-Mail:</label>
+  <input id="email" formControlName="email" type="email" required />
+
+  <p><strong>Gewählte Sitzplätze:</strong> {{ buchungForm.value.sitzplatzIds.join(', ') }}</p>
+
+  <button type="submit" [disabled]="buchungForm.invalid">Buchen</button>
+</form>

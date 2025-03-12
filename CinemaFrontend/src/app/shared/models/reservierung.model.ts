@@ -1,15 +1,12 @@
-import { Film } from './film.model';
-import { Auffuehrung } from './auffuehrung.model';
-import { Kinosaal } from './kinosaal.model';
-
 export interface Reservierung {
   id: number;
   kundeId: number;
-  film: Film;
-  auffuehrung: Auffuehrung;
-  kinosaal: Kinosaal;
-  sitzplaetze: string[];
-  datum: Date;
-  uhrzeit: string;
+  auffuehrungId: number;
+  sitzplatzIds: number[];
+  datum: string;  // ISO-Format: YYYY-MM-DD
+  uhrzeit: string; // HH:MM
   preis: number;
+  name: string;
+  email: string;
+  status: 'aktiv' | 'storniert' | 'abgelaufen';
 }

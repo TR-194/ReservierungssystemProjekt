@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AuffuehrungService } from 'src/app/shared/services/auffuehrung.service';
-import { ReservierungService } from 'src/app/shared/services/reservierung.service';
-import { BuchungService } from 'src/app/shared/services/buchung.service';
+import { KafkaService } from 'src/app/shared/services/kafka.service';
 import { Auffuehrung } from 'src/app/shared/models/auffuehrung.model';
+import { Sitzplatz } from 'src/app/shared/models/sitzplatz.model';
+import { Film } from 'src/app/shared/models/film.model';
+import { Kinosaal } from 'src/app/shared/models/kinosaal.model';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -14,60 +15,59 @@ import { CommonModule } from '@angular/common';
 })
 export class AuffuehrungDetailComponent implements OnInit {
   auffuehrung: Auffuehrung | null = null;
+  sitzplaetze: Sitzplatz[] = [];
   ausgewaehlteSitze: number[] = [];
-  reservierteSitze: number[] = [];
-  gebuchteSitze: number[] = [];
+  film: Film | null = null;
+  kinosaal: Kinosaal | null = null;
 
   constructor(
     private route: ActivatedRoute,
-    private auffuehrungService: AuffuehrungService,
-    private reservierungService: ReservierungService,
-    private buchungService: BuchungService,
+    private kafkaService: KafkaService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
     this.ladeAuffuehrung();
-    this.ladeReservierteSitze();
-    this.ladeGebuchteSitze();
   }
 
   ladeAuffuehrung(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     if (id) {
-      this.auffuehrungService.getAuffuehrungById(id).subscribe(
-        (data: Auffuehrung) => this.auffuehrung = data,
-        error => console.error('Fehler beim Laden der Aufführung', error)
-      );
+      this.kafkaService.sendRequest<Auffuehrung>('auffuehrung.getById', id)
+        .subscribe(
+          data => {
+            this.auffuehrung = data;
+            this.ladeSitzplaetze(id);
+            this.ladeFilm(data.filmId);
+            this.ladeKinosaal(data.kinosaalId);
+          },
+          error => console.error('Fehler beim Laden der Aufführung', error)
+        );
     }
   }
 
-  ladeReservierteSitze(): void {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
-    if (id) {
-      this.reservierungService.getReservierungen().subscribe(
-        reservierungen => {
-          this.reservierteSitze = reservierungen
-            .filter(reservierung => reservierung.auffuehrung.id === id)
-            .flatMap(reservierung => reservierung.sitzplaetze.map(Number));
-        },
-        error => console.error('Fehler beim Laden der reservierten Sitze', error)
+  ladeSitzplaetze(auffuehrungId: number): void {
+    this.kafkaService.sendRequest<Sitzplatz[]>('sitzplatz.getByAuffuehrung', auffuehrungId)
+      .subscribe(
+        sitzplaetze => this.sitzplaetze = sitzplaetze,
+        error => console.error('Fehler beim Laden der Sitzplätze', error)
       );
-    }
   }
 
-  ladeGebuchteSitze(): void {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
-    if (id) {
-      this.buchungService.getBuchungen().subscribe(
-        buchungen => {
-          this.gebuchteSitze = buchungen
-            .filter(buchung => buchung.auffuehrungId === id)
-            .flatMap(buchung => buchung.sitzplaetze);
-        },
-        error => console.error('Fehler beim Laden der gebuchten Sitze', error)
+  ladeFilm(filmId: number): void {
+    this.kafkaService.sendRequest<Film>('film.getById', filmId)
+      .subscribe(
+        data => this.film = data,
+        error => console.error('Fehler beim Laden des Films', error)
       );
-    }
+  }
+
+  ladeKinosaal(kinosaalId: number): void {
+    this.kafkaService.sendRequest<Kinosaal>('kinosaal.getById', kinosaalId)
+      .subscribe(
+        data => this.kinosaal = data,
+        error => console.error('Fehler beim Laden des Kinosaals', error)
+      );
   }
 
   onSitzplatzAuswaehlen(sitzplatzId: number): void {
@@ -84,9 +84,7 @@ export class AuffuehrungDetailComponent implements OnInit {
       this.router.navigate(['/reservierung-form'], { 
         queryParams: { 
           sitzplaetze: this.ausgewaehlteSitze.join(','), 
-          film: this.auffuehrung.film.id, 
-          auffuehrung: this.auffuehrung.id, 
-          kinosaal: this.auffuehrung.kinosaal.id 
+          auffuehrungId: this.auffuehrung.id 
         } 
       });
     }
@@ -97,9 +95,7 @@ export class AuffuehrungDetailComponent implements OnInit {
       this.router.navigate(['/buchung-form'], { 
         queryParams: { 
           sitzplaetze: this.ausgewaehlteSitze.join(','), 
-          film: this.auffuehrung.film.id, 
-          auffuehrung: this.auffuehrung.id, 
-          kinosaal: this.auffuehrung.kinosaal.id 
+          auffuehrungId: this.auffuehrung.id 
         } 
       });
     }

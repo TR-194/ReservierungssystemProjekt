@@ -33,7 +33,7 @@
     </div>
 
     <div class="form-group">
-      <label for="neueSitzreihe">Sitzreihen:</label>
+      <label for="neueSitzreihe">Sitzreihen hinzufügen:</label>
       <input
         type="number"
         id="anzahlSitzplaetze"
@@ -48,13 +48,13 @@
     <ul class="list-group mt-2">
       <li *ngFor="let reihe of sitzreihen; let i = index" class="list-group-item">
         <div class="d-flex justify-content-between">
-          <span>Reihe {{ reihe.reihenNummer }} - Kategorie: {{ reihe.kategorie.name }}</span>
+          <span>Reihe {{ reihe.reihenNummer }} - Kategorie: {{ ausgewaehlteKategorie }}</span>
           <button type="button" class="btn btn-danger btn-sm" (click)="entferneSitzreihe(i)">✖</button>
         </div>
         <div class="seat-layout">
           <div class="row">
-            <div class="seat" *ngFor="let platz of reihe.sitzplaetze" [ngClass]="{'free': platz.status === 'frei', 'occupied': platz.status !== 'frei'}">
-              {{ platz.nummer }}
+            <div class="seat" *ngFor="let platzId of reihe.sitzplatzIds" [ngClass]="{'free': true}">
+              Platz {{ platzId }}
             </div>
           </div>
         </div>

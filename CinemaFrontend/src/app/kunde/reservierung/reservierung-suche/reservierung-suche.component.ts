@@ -1,9 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Reservierung } from 'src/app/shared/models/reservierung.model';
+import { KafkaService } from 'src/app/shared/services/kafka.service';
 
 @Component({
   selector: 'app-reservierung-suche',
+  standalone: true,
   imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './reservierung-suche.component.html',
   styleUrls: ['./reservierung-suche.component.css']
@@ -11,9 +14,10 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 export class ReservierungSucheComponent {
   suchForm: FormGroup;
   reservierungGefunden = false;
-  reservierungsDaten: { name: string; email: string; sitzplaetze: string[]; status: string } | null = null;
+  reservierungsDaten: Reservierung | null = null;
+  isLoading = false;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private kafkaService: KafkaService) {
     this.suchForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]]
     });
@@ -22,31 +26,59 @@ export class ReservierungSucheComponent {
   onSearch() {
     if (this.suchForm.valid) {
       const email = this.suchForm.value.email;
+      this.isLoading = true;
       console.log('Suche Reservierung für:', email);
       
-      // Später hier die Backend-Anbindung, um die Reservierung zu suchen
-      // Temporäre Simulation einer gefundenen Reservierung
-      setTimeout(() => {
-        this.reservierungGefunden = true;
-        this.reservierungsDaten = {
-          name: 'Max Mustermann',
-          email: email,
-          sitzplaetze: ['A1', 'A2'],
-          status: 'Reserviert'
-        };
-      }, 1000);
+      this.kafkaService.sendRequest<Reservierung>('reservierung.getByEmail', { email })
+        .subscribe(
+          (reservierung: Reservierung) => {
+            this.isLoading = false;
+            if (reservierung) {
+              this.reservierungGefunden = true;
+              this.reservierungsDaten = reservierung;
+            } else {
+              this.reservierungGefunden = false;
+              this.reservierungsDaten = null;
+            }
+          },
+          (error) => {
+            this.isLoading = false;
+            console.error('Fehler beim Suchen der Reservierung:', error);
+            this.reservierungGefunden = false;
+            this.reservierungsDaten = null;
+          }
+        );
     }
   }
 
   onBuchen() {
-    console.log('Reservierung in Buchung umwandeln:', this.reservierungsDaten);
-    // Später Backend-Aufruf zum Buchen der Reservierung
+    if (this.reservierungsDaten) {
+      console.log('Reservierung in Buchung umwandeln:', this.reservierungsDaten);
+      this.kafkaService.sendRequest<Reservierung>('reservierung.convertToBuchung', { reservierungsId: this.reservierungsDaten.id })
+        .subscribe(
+          (updatedReservierung: Reservierung) => {
+            this.reservierungsDaten = updatedReservierung;
+          },
+          (error) => {
+            console.error('Fehler beim Buchen der Reservierung:', error);
+          }
+        );
+    }
   }
 
   onStornieren() {
-    console.log('Reservierung stornieren:', this.reservierungsDaten);
-    // Später Backend-Aufruf zur Stornierung der Reservierung
-    this.reservierungGefunden = false;
-    this.reservierungsDaten = null;
+    if (this.reservierungsDaten) {
+      console.log('Reservierung stornieren:', this.reservierungsDaten);
+      this.kafkaService.sendRequest<void>('reservierung.cancel', { reservierungsId: this.reservierungsDaten.id })
+        .subscribe(
+          () => {
+            this.reservierungGefunden = false;
+            this.reservierungsDaten = null;
+          },
+          (error) => {
+            console.error('Fehler beim Stornieren der Reservierung:', error);
+          }
+        );
+    }
   }
 }
