@@ -33,4 +33,22 @@ public class KinosaalConsumer {
         KinosaalDTO kinosaalDTO = (KinosaalDTO) request.get("data");
         kafkaRequestSender.sendRequest("db.kinosaal.update", kinosaalDTO, Void.class);
     }
+
+    @KafkaListener(topics = "kinosaal.create", groupId = "kino-group")
+    public void handleKinosaalErstellt(Map<String, Object> request) {
+        KinosaalDTO kinosaalDTO = (KinosaalDTO) request.get("data");
+        kafkaRequestSender.sendRequest("db.kinosaal.create", kinosaalDTO, Void.class);
+    }
+
+    @KafkaListener(topics = "kinosaal.toggleFreigabe", groupId = "kino-group")
+    public void handleKinosaalToggleFreigabe(Map<String, Object> request) {
+        Long id = ((Number) request.get("data")).longValue();
+        kafkaRequestSender.sendRequest("db.kinosaal.toggleFreigabe", id, Void.class);
+    }
+
+    @KafkaListener(topics = "kinosaal.delete", groupId = "kino-group")
+    public void handleKinosaalGeloescht(Map<String, Object> request) {
+        Long id = ((Number) request.get("data")).longValue();
+        kafkaRequestSender.sendRequest("db.kinosaal.delete", id, Void.class);
+    }
 }

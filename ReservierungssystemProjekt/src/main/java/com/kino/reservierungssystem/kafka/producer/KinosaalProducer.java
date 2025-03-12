@@ -28,4 +28,8 @@ public class KinosaalProducer {
     public void sendKinosaalGeloescht(Long id) {
         kafkaIdTemplate.send("kinosaal.deleted", id);
     }
+
+    public void sendKinosaalToggleFreigabe(Long id) {
+        kafkaIdTemplate.send("kinosaal.toggleFreigabe", id);
+    }
 }

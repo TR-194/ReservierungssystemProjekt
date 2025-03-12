@@ -15,9 +15,11 @@ public class WebSocketController {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    @MessageMapping("/sendKafkaRequest")
+    @MessageMapping("/kafkaRequest")
     public void sendKafkaRequest(Map<String, Object> message) {
         String eventType = (String) message.get("eventType");
+
+        System.out.println("Empfangene Anfrage über WebSocket: " + eventType);
         kafkaTemplate.send(eventType, message);
     }
 }
