@@ -10,6 +10,8 @@ import lombok.*;
 public class ZahlungDTO {
     private Long id;
     private double betrag;
+    private String filmtitel;
+    private Long auffuehrungId;
     private LocalDate zahlungsdatum;
-    private Long buchungId;  // <-- Make sure this field exists
+    private Long buchungId;
 }

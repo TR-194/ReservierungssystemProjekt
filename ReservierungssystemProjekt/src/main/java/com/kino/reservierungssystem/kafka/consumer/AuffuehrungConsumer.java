@@ -1,61 +1,58 @@
 package com.kino.reservierungssystem.kafka.consumer;
 
 import com.kino.reservierungssystem.dto.AuffuehrungDTO;
+import com.kino.reservierungssystem.kafka.request.KafkaRequestSender;
 import com.kino.reservierungssystem.kafka.response.KafkaResponseHandler;
-import com.kino.reservierungssystem.mapper.AuffuehrungMapper;
-import com.kino.reservierungssystem.model.Auffuehrung;
-import com.kino.reservierungssystem.repository.AuffuehrungRepository;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 @Component
 public class AuffuehrungConsumer {
 
-    private final AuffuehrungRepository auffuehrungRepository;
+    private final KafkaRequestSender kafkaRequestSender;
     private final KafkaResponseHandler kafkaResponseHandler;
-    private final AuffuehrungMapper auffuehrungMapper;
 
-    public AuffuehrungConsumer(AuffuehrungRepository auffuehrungRepository, KafkaResponseHandler kafkaResponseHandler, AuffuehrungMapper auffuehrungMapper) {
-        this.auffuehrungRepository = auffuehrungRepository;
+    public AuffuehrungConsumer(KafkaRequestSender kafkaRequestSender, KafkaResponseHandler kafkaResponseHandler) {
+        this.kafkaRequestSender = kafkaRequestSender;
         this.kafkaResponseHandler = kafkaResponseHandler;
-        this.auffuehrungMapper = auffuehrungMapper;
     }
 
     @KafkaListener(topics = "kino.auffuehrung.getAll", groupId = "kino-group")
-    public void handleAuffuehrungAnfrage(String requestId) {
-        List<AuffuehrungDTO> auffuehrungen = auffuehrungRepository.findAll().stream()
-                .map(auffuehrungMapper::fromEntity)
-                .collect(Collectors.toList());
+    public void handleAuffuehrungAnfrage(Map<String, Object> request) {
+        String requestId = (String) request.get("requestId");
+        List<AuffuehrungDTO> auffuehrungen = kafkaRequestSender.sendRequest(
+                "db.auffuehrung.getAll", null, List.class).join();
         kafkaResponseHandler.sendResponse(requestId, auffuehrungen);
     }
 
     @KafkaListener(topics = "kino.auffuehrung.getById", groupId = "kino-group")
-    public void handleAuffuehrungByIdAnfrage(String requestId, Long id) {
-        Auffuehrung auffuehrung = auffuehrungRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Auffuehrung nicht gefunden mit ID: " + id));
-        kafkaResponseHandler.sendResponse(requestId, auffuehrungMapper.fromEntity(auffuehrung));
+    public void handleAuffuehrungByIdAnfrage(Map<String, Object> request) {
+        String requestId = (String) request.get("requestId");
+        Long id = ((Number) request.get("data")).longValue();
+
+        AuffuehrungDTO auffuehrung = kafkaRequestSender.sendRequest(
+                "db.auffuehrung.getById", id, AuffuehrungDTO.class).join();
+        kafkaResponseHandler.sendResponse(requestId, auffuehrung);
     }
 
     @KafkaListener(topics = "kino.auffuehrung.create", groupId = "kino-group")
-    public void handleAuffuehrungErstellt(AuffuehrungDTO auffuehrungDTO) {
-        Auffuehrung auffuehrung = auffuehrungMapper.toEntity(auffuehrungDTO);
-        auffuehrungRepository.save(auffuehrung);
+    public void handleAuffuehrungErstellt(Map<String, Object> request) {
+        AuffuehrungDTO auffuehrungDTO = (AuffuehrungDTO) request.get("data");
+        kafkaRequestSender.sendRequest("db.auffuehrung.create", auffuehrungDTO, Void.class);
     }
 
     @KafkaListener(topics = "kino.auffuehrung.update", groupId = "kino-group")
-    public void handleAuffuehrungAktualisiert(AuffuehrungDTO auffuehrungDTO) {
-        Auffuehrung auffuehrung = auffuehrungRepository.findById(auffuehrungDTO.getId())
-                .orElseThrow(() -> new RuntimeException("Auffuehrung nicht gefunden mit ID: " + auffuehrungDTO.getId()));
-        auffuehrung.setDatum(auffuehrungDTO.getDatum());
-        auffuehrung.setUhrzeit(auffuehrungDTO.getUhrzeit());
-        auffuehrungRepository.save(auffuehrung);
+    public void handleAuffuehrungAktualisiert(Map<String, Object> request) {
+        AuffuehrungDTO auffuehrungDTO = (AuffuehrungDTO) request.get("data");
+        kafkaRequestSender.sendRequest("db.auffuehrung.update", auffuehrungDTO, Void.class);
     }
 
     @KafkaListener(topics = "kino.auffuehrung.delete", groupId = "kino-group")
-    public void handleAuffuehrungGeloescht(Long id) {
-        auffuehrungRepository.deleteById(id);
+    public void handleAuffuehrungGeloescht(Map<String, Object> request) {
+        Long id = ((Number) request.get("data")).longValue();
+        kafkaRequestSender.sendRequest("db.auffuehrung.delete", id, Void.class);
     }
 }
