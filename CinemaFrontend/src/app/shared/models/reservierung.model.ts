@@ -1,6 +1,5 @@
 export interface Reservierung {
   id: number;
-  kundeId: number;
   auffuehrungId: number;
   sitzplatzIds: number[];
   datum: string;  // ISO-Format: YYYY-MM-DD

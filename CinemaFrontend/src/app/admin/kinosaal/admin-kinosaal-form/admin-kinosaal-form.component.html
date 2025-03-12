@@ -25,6 +25,7 @@
       />
     </div>
 
+    <!-- Sitzreihe hinzufügen -->
     <div class="form-group">
       <label for="kategorie">Kategorie:</label>
       <select id="kategorie" [(ngModel)]="ausgewaehlteKategorie" name="kategorie" class="form-control">
@@ -33,29 +34,31 @@
     </div>
 
     <div class="form-group">
-      <label for="neueSitzreihe">Sitzreihen hinzufügen:</label>
+      <label for="anzahlSitzplaetze">Anzahl der Sitzplätze:</label>
       <input
         type="number"
         id="anzahlSitzplaetze"
         [(ngModel)]="anzahlSitzplaetze"
         name="anzahlSitzplaetze"
         class="form-control"
+        min="1"
         placeholder="Anzahl der Sitzplätze"
       />
       <button type="button" class="btn btn-success" (click)="hinzufuegenSitzreihe()">Hinzufügen</button>
     </div>
 
+    <!-- Sitzreihen Liste -->
     <ul class="list-group mt-2">
       <li *ngFor="let reihe of sitzreihen; let i = index" class="list-group-item">
         <div class="d-flex justify-content-between">
-          <span>Reihe {{ reihe.reihenNummer }} - Kategorie: {{ ausgewaehlteKategorie }}</span>
+          <span>Reihe {{ reihe.reihenNummer }} - Kategorie: {{ reihe.kategorieId }}</span>
           <button type="button" class="btn btn-danger btn-sm" (click)="entferneSitzreihe(i)">✖</button>
         </div>
+
+        <!-- Sitzplatz-Anzeige -->
         <div class="seat-layout">
           <div class="row">
-            <div class="seat" *ngFor="let platzId of reihe.sitzplatzIds" [ngClass]="{'free': true}">
-              Platz {{ platzId }}
-            </div>
+            <div class="seat free" *ngFor="let _ of getSitzplaetzeAnzahl(reihe)"></div>
           </div>
         </div>
       </li>

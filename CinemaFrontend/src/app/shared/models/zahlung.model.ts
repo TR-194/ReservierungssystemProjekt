@@ -1,7 +1,8 @@
 export interface Zahlung {
   id: number;
   betrag: number;
+  filmtitel: string;
+  aufuehrungId: number;
   zahlungsdatum: string;  // ISO-Format: YYYY-MM-DD
-  methode: 'Bar'; 
   buchungId: number; // Verknüpfung zur Buchung
 }

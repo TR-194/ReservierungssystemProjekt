@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { KafkaService } from 'src/app/shared/services/kafka.service';
 import { Auffuehrung } from 'src/app/shared/models/auffuehrung.model';
 import { Sitzplatz } from 'src/app/shared/models/sitzplatz.model';
+import { Sitzreihe } from 'src/app/shared/models/sitzreihe.model';
 import { Film } from 'src/app/shared/models/film.model';
 import { Kinosaal } from 'src/app/shared/models/kinosaal.model';
 import { CommonModule } from '@angular/common';
@@ -16,9 +17,11 @@ import { CommonModule } from '@angular/common';
 export class AuffuehrungDetailComponent implements OnInit {
   auffuehrung: Auffuehrung | null = null;
   sitzplaetze: Sitzplatz[] = [];
+  sitzreihen: Sitzreihe[] = [];
   ausgewaehlteSitze: number[] = [];
   film: Film | null = null;
   kinosaal: Kinosaal | null = null;
+  gesamtpreis = 0;
 
   constructor(
     private route: ActivatedRoute,
@@ -38,6 +41,7 @@ export class AuffuehrungDetailComponent implements OnInit {
           data => {
             this.auffuehrung = data;
             this.ladeSitzplaetze(id);
+            this.ladeSitzreihen(data.kinosaalId);
             this.ladeFilm(data.filmId);
             this.ladeKinosaal(data.kinosaalId);
           },
@@ -51,6 +55,14 @@ export class AuffuehrungDetailComponent implements OnInit {
       .subscribe(
         sitzplaetze => this.sitzplaetze = sitzplaetze,
         error => console.error('Fehler beim Laden der Sitzplätze', error)
+      );
+  }
+
+  ladeSitzreihen(kinosaalId: number): void {
+    this.kafkaService.sendRequest<Sitzreihe[]>('sitzreihe.getByKinosaal', kinosaalId)
+      .subscribe(
+        sitzreihen => this.sitzreihen = sitzreihen,
+        error => console.error('Fehler beim Laden der Sitzreihen', error)
       );
   }
 
@@ -77,6 +89,32 @@ export class AuffuehrungDetailComponent implements OnInit {
     } else {
       this.ausgewaehlteSitze.splice(index, 1);
     }
+    this.berechneGesamtpreis();
+  }
+
+  getSitzplatzKategorie(sitzplatzId: number): number | undefined {
+    const sitzplatz = this.sitzplaetze.find(sitz => sitz.id === sitzplatzId);
+    if (!sitzplatz) return undefined;
+  
+    const sitzreihe = this.sitzreihen.find(reihe => reihe.id === sitzplatz.sitzreiheId);
+    
+    return sitzreihe?.kategorieId as unknown as number;
+  }
+
+  berechneGesamtpreis(): void {
+    if (!this.auffuehrung) return;
+
+    this.gesamtpreis = this.ausgewaehlteSitze.reduce((sum, sitzId) => {
+      const kategorieId = this.getSitzplatzKategorie(sitzId);
+      if (kategorieId) {
+        switch (kategorieId) {
+          case 1: return sum + this.auffuehrung!.preismodell.parkettPreis;
+          case 2: return sum + this.auffuehrung!.preismodell.logePreis;
+          case 3: return sum + this.auffuehrung!.preismodell.logeMitServicePreis;
+        }
+      }
+      return sum;
+    }, 0);
   }
 
   reservieren(): void {
@@ -84,7 +122,8 @@ export class AuffuehrungDetailComponent implements OnInit {
       this.router.navigate(['/reservierung-form'], { 
         queryParams: { 
           sitzplaetze: this.ausgewaehlteSitze.join(','), 
-          auffuehrungId: this.auffuehrung.id 
+          auffuehrungId: this.auffuehrung.id,
+          preis: this.gesamtpreis
         } 
       });
     }
@@ -95,7 +134,8 @@ export class AuffuehrungDetailComponent implements OnInit {
       this.router.navigate(['/buchung-form'], { 
         queryParams: { 
           sitzplaetze: this.ausgewaehlteSitze.join(','), 
-          auffuehrungId: this.auffuehrung.id 
+          auffuehrungId: this.auffuehrung.id,
+          preis: this.gesamtpreis
         } 
       });
     }

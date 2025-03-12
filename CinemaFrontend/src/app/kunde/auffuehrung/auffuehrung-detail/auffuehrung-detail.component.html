@@ -16,6 +16,8 @@
     </div>
   </div>
 
+  <h3>Gesamtpreis: {{ gesamtpreis | currency:'EUR' }}</h3>
+
   <button (click)="reservieren()">Reservieren</button>
   <button (click)="buchen()">Buchen</button>
 </div>

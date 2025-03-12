@@ -23,11 +23,11 @@ export class AdminKinosaalFormComponent {
   name = '';
   freigegeben = false;
   sitzreihen: Sitzreihe[] = [];
-  sitzreihenIds: number[] = []; // IDs statt vollständige Objekte
+  sitzreihenIds: number[] = [];
   kategorieTypen = Object.values(KategorieTyp);
-  ausgewaehlteKategorie: KategorieTyp = KategorieTyp.PARKETT;
+  kinosaalId = 0;
   anzahlSitzplaetze = 0;
-  kinosaalId = 0; // Platzhalter für die ID des gespeicherten Kinosaals
+  ausgewaehlteKategorie: KategorieTyp = KategorieTyp.PARKETT;
 
   constructor(private kafkaService: KafkaService, private router: Router) {}
 
@@ -36,12 +36,12 @@ export class AdminKinosaalFormComponent {
       id: this.kinosaalId, 
       name: this.name, 
       freigegeben: this.freigegeben, 
-      sitzreihenIds: [...this.sitzreihenIds] // IDs der Sitzreihen senden
+      sitzreihenIds: [...this.sitzreihenIds] 
     };
 
     this.kafkaService.sendRequest<Kinosaal>('kinosaal.create', neuerSaal).subscribe(
       (gespeicherterSaal) => {
-        this.kinosaalId = gespeicherterSaal.id; // Backend setzt ID
+        this.kinosaalId = gespeicherterSaal.id;
         this.speichereSitzreihen();
       },
       error => console.error('Fehler beim Speichern des Kinosaals', error)
@@ -50,11 +50,11 @@ export class AdminKinosaalFormComponent {
 
   speichereSitzreihen(): void {
     this.sitzreihen.forEach((reihe) => {
-      reihe.kinosaalId = this.kinosaalId; // Kinosaal-ID setzen
+      reihe.kinosaalId = this.kinosaalId;
 
       this.kafkaService.sendRequest<Sitzreihe>('sitzreihe.create', reihe).subscribe(
         (gespeicherteReihe) => {
-          reihe.id = gespeicherteReihe.id; // ID aus Backend übernehmen
+          reihe.id = gespeicherteReihe.id;
           reihe.sitzplatzIds = gespeicherteReihe.sitzplatzIds;
         },
         error => console.error('Fehler beim Speichern der Sitzreihe', error)
@@ -65,22 +65,27 @@ export class AdminKinosaalFormComponent {
   }
 
   hinzufuegenSitzreihe(): void {
-    const neueSitzreiheId = this.sitzreihen.length + 1; // Simulierte ID
-    this.sitzreihenIds.push(neueSitzreiheId); // ID speichern
+    if (this.anzahlSitzplaetze <= 0) {
+      console.error("Die Anzahl der Sitzplätze muss größer als 0 sein.");
+      return;
+    }
+
+    const neueSitzreiheId = this.sitzreihen.length + 1;
+    this.sitzreihenIds.push(neueSitzreiheId);
 
     const neueSitzplaetze: Sitzplatz[] = Array.from({ length: this.anzahlSitzplaetze }, (_, i) => ({
-      id: 0, // Backend setzt ID
+      id: 0, 
       nummer: i + 1,
       status: 'frei' as const,
-      sitzreiheId: neueSitzreiheId // Sitzreihe ID zuweisen
+      sitzreiheId: neueSitzreiheId 
     }));
 
     const neueReihe: Sitzreihe = {
-      id: neueSitzreiheId, // Simulierte ID
+      id: neueSitzreiheId,
       reihenNummer: this.sitzreihen.length + 1,
-      sitzplatzIds: neueSitzplaetze.map(sp => sp.id), // Sitzplatz-IDs speichern
-      kategorieId: 0, // Platzhalter für Kategorie ID
-      kinosaalId: this.kinosaalId // Kinosaal-ID setzen
+      kategorieId: this.ausgewaehlteKategorie,
+      sitzplatzIds: neueSitzplaetze.map(sp => sp.id),
+      kinosaalId: this.kinosaalId
     };
 
     this.sitzreihen.push(neueReihe);
@@ -90,6 +95,10 @@ export class AdminKinosaalFormComponent {
     this.sitzreihenIds.splice(index, 1);
     this.sitzreihen.splice(index, 1);
     this.sitzreihen.forEach((reihe, i) => reihe.reihenNummer = i + 1);
+  }
+
+  getSitzplaetzeAnzahl(reihe: Sitzreihe): number[] {
+    return Array.from({ length: reihe.sitzplatzIds.length || this.anzahlSitzplaetze });
   }
 
   navigateToKinosaal() {
