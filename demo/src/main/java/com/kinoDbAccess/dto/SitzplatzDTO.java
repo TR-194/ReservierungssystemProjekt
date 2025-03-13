@@ -13,5 +13,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class SitzplatzDTO implements Serializable {
     private Long id;
     private int nummer;
-    private Long reiheId;
+    private String status; // "frei", "reserviert", "gebucht"
+    private Long SitzreiheId;
 }

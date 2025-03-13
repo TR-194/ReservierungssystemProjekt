@@ -14,18 +14,18 @@ public class BuchungProducer {
     }
 
     public void sendBuchungAnfrage(String requestId) {
-        kafkaTemplate.send("kino.buchung.getAll", requestId);
+        kafkaTemplate.send("kinoBuchungGetAll", requestId);
     }
 
     public void sendBuchungByIdAnfrage(String requestId, Long id) {
-        kafkaTemplate.send("kino.buchung.getById", requestId, id);
+        kafkaTemplate.send("kinoBuchungGetById", requestId, id);
     }
 
     public void sendBuchungErstellt(BuchungDTO buchungDTO) {
-        kafkaTemplate.send("kino.buchung.create", buchungDTO);
+        kafkaTemplate.send("kinoBuchungCreate", buchungDTO);
     }
 
     public void sendBuchungGeloescht(Long id) {
-        kafkaTemplate.send("kino.buchung.delete", id);
+        kafkaTemplate.send("kinoBuchungDelete", id);
     }
 }

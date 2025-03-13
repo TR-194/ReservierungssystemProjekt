@@ -15,20 +15,38 @@ public class SitzplatzConsumer {
         this.kafkaResponseHandler = kafkaResponseHandler;
     }
 
-    @KafkaListener(topics = "sitzplatz.getAll", groupId = "kino-group")
+    @KafkaListener(topics = "sitzplatzGetAll", groupId = "kino-group")
     public void handleGetAllSitzplaetze(Map<String, Object> request) {
         String requestId = (String) request.get("requestId");
         kafkaResponseHandler.sendResponse(requestId, request.get("data"));
     }
 
-    @KafkaListener(topics = "sitzplatz.getById", groupId = "kino-group")
+    @KafkaListener(topics = "sitzplatzGetById", groupId = "kino-group")
     public void handleGetSitzplatzById(Map<String, Object> request) {
         String requestId = (String) request.get("requestId");
         kafkaResponseHandler.sendResponse(requestId, request.get("data"));
     }
 
-    @KafkaListener(topics = "sitzplatz.updateStatus", groupId = "kino-group")
+    @KafkaListener(topics = "sitzplatzUpdateStatus", groupId = "kino-group")
     public void handleUpdateSitzplatzStatus(Map<String, Object> request) {
+        String requestId = (String) request.get("requestId");
+        kafkaResponseHandler.sendResponse(requestId, request.get("data"));
+    }
+
+    @KafkaListener(topics = "sitzplatzGetByAuffuehrung", groupId = "kino-group")
+    public void handleSitzplaetzeByAuffuehrung(Map<String, Object> request) {
+        String requestId = (String) request.get("requestId");
+        kafkaResponseHandler.sendResponse(requestId, request.get("data"));
+    }
+
+    @KafkaListener(topics = "sitzplatzGetByKinosaal", groupId = "kino-group")
+    public void handleSitzplaetzeByKinosaal(Map<String, Object> request) {
+        String requestId = (String) request.get("requestId");
+        kafkaResponseHandler.sendResponse(requestId, request.get("data"));
+    }
+
+    @KafkaListener(topics = "sitzplatzGetVerfuegbare", groupId = "kino-group")
+    public void handleVerfuegbareSitzplaetze(Map<String, Object> request) {
         String requestId = (String) request.get("requestId");
         kafkaResponseHandler.sendResponse(requestId, request.get("data"));
     }

@@ -1,8 +1,6 @@
 package com.kinoDbAccess.kafka;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -10,11 +8,7 @@ import java.util.Map;
 @Service
 public class KafkaResponseSender {
 
-    public void setKafkaTemplate(KafkaTemplate<String, Map<String, Object>> kafkaTemplate) {
-        this.kafkaTemplate = kafkaTemplate;
-    }
-
-    private KafkaTemplate<String, Map<String, Object>> kafkaTemplate;
+    private final KafkaTemplate<String, Map<String, Object>> kafkaTemplate;
 
     public KafkaResponseSender(KafkaTemplate<String, Map<String, Object>> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;

@@ -11,7 +11,6 @@ public class DemoApplication {
 	public static void main(String[] args) {
 		ApplicationContext context = SpringApplication.run(DemoApplication.class, args);
 		DbAccess dbAccess = context.getBean(DbAccess.class);
-		System.out.println(dbAccess.GetAllSaele().toString());
 		KafkaRequestHandler requestHandler = context.getBean(KafkaRequestHandler.class);
 	}
 }

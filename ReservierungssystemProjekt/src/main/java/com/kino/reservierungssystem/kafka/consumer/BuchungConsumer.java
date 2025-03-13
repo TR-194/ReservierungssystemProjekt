@@ -20,33 +20,33 @@ public class BuchungConsumer {
         this.kafkaResponseHandler = kafkaResponseHandler;
     }
 
-    @KafkaListener(topics = "kino.buchung.getAll", groupId = "kino-group")
+    @KafkaListener(topics = "buchungGetAll", groupId = "kino-group")
     public void handleBuchungAnfrage(Map<String, Object> request) {
         String requestId = (String) request.get("requestId");
         List<BuchungDTO> buchungen = kafkaRequestSender.sendRequest(
-                "db.buchung.getAll", null, List.class).join();
+                "dbBuchungGetAll", null, List.class).join();
         kafkaResponseHandler.sendResponse(requestId, buchungen);
     }
 
-    @KafkaListener(topics = "kino.buchung.getById", groupId = "kino-group")
+    @KafkaListener(topics = "buchungGetById", groupId = "kino-group")
     public void handleBuchungByIdAnfrage(Map<String, Object> request) {
         String requestId = (String) request.get("requestId");
         Long id = ((Number) request.get("data")).longValue();
 
         BuchungDTO buchung = kafkaRequestSender.sendRequest(
-                "db.buchung.getById", id, BuchungDTO.class).join();
+                "dbBuchungGetById", id, BuchungDTO.class).join();
         kafkaResponseHandler.sendResponse(requestId, buchung);
     }
 
-    @KafkaListener(topics = "kino.buchung.create", groupId = "kino-group")
+    @KafkaListener(topics = "buchungCreate", groupId = "kino-group")
     public void handleBuchungErstellt(Map<String, Object> request) {
         BuchungDTO buchungDTO = (BuchungDTO) request.get("data");
-        kafkaRequestSender.sendRequest("db.buchung.create", buchungDTO, Void.class);
+        kafkaRequestSender.sendRequest("dbBuchungCreate", buchungDTO, Void.class);
     }
 
-    @KafkaListener(topics = "kino.buchung.delete", groupId = "kino-group")
+    @KafkaListener(topics = "buchungDelete", groupId = "kino-group")
     public void handleBuchungGeloescht(Map<String, Object> request) {
         Long id = ((Number) request.get("data")).longValue();
-        kafkaRequestSender.sendRequest("db.buchung.delete", id, Void.class);
+        kafkaRequestSender.sendRequest("dbBuchungDelete", id, Void.class);
     }
 }

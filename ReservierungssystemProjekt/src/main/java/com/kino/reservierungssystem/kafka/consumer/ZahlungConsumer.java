@@ -15,13 +15,13 @@ public class ZahlungConsumer {
         this.kafkaResponseHandler = kafkaResponseHandler;
     }
 
-    @KafkaListener(topics = "zahlung.create", groupId = "kino-group")
+    @KafkaListener(topics = "zahlungCreate", groupId = "kino-group")
     public void handleZahlungErstellung(Map<String, Object> request) {
         String requestId = (String) request.get("requestId");
         kafkaResponseHandler.sendResponse(requestId, request.get("data"));
     }
 
-    @KafkaListener(topics = "zahlung.getByBuchungId", groupId = "kino-group")
+    @KafkaListener(topics = "zahlungGetByBuchungId", groupId = "kino-group")
     public void handleZahlungByBuchungId(Map<String, Object> request) {
         String requestId = (String) request.get("requestId");
         kafkaResponseHandler.sendResponse(requestId, request.get("data"));

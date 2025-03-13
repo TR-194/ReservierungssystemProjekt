@@ -18,10 +18,10 @@ public class ZahlungProducer {
      * Sendet eine Anfrage zum Abruf einer Zahlung für eine Buchung.
      */
     public void sendZahlungByBuchungIdAnfrage(String requestId, Long buchungId) {
-        kafkaTemplate.send("zahlung.getByBuchungId", requestId, buchungId);
+        kafkaTemplate.send("zahlungGetByBuchungId", requestId, buchungId);
     }
 
     public void sendZahlungErstellt(ZahlungDTO zahlungDTO) {
-        kafkaTemplate.send("zahlung.create", zahlungDTO);
+        kafkaTemplate.send("zahlungCreate", zahlungDTO);
     }
 }

@@ -15,13 +15,13 @@ public class StatistikConsumer {
         this.kafkaResponseHandler = kafkaResponseHandler;
     }
 
-    @KafkaListener(topics = "statistik.einnahmen.auffuehrung", groupId = "kino-group")
+    @KafkaListener(topics = "statistikGetEinnahmenProAuffuehrung", groupId = "kino-group")
     public void handleEinnahmenAuffuehrung(Map<String, Object> request) {
         String requestId = (String) request.get("requestId");
         kafkaResponseHandler.sendResponse(requestId, request.get("data"));
     }
 
-    @KafkaListener(topics = "statistik.einnahmen.film", groupId = "kino-group")
+    @KafkaListener(topics = "statistikGetEinnahmenProFilm", groupId = "kino-group")
     public void handleEinnahmenFilm(Map<String, Object> request) {
         String requestId = (String) request.get("requestId");
         kafkaResponseHandler.sendResponse(requestId, request.get("data"));

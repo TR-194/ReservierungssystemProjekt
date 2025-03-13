@@ -17,20 +17,33 @@ public class SitzplatzProducer {
      * Sendet eine Anfrage zur Abfrage aller Sitzplätze.
      */
     public void sendSitzplatzAnfrage(String requestId) {
-        kafkaTemplate.send("sitzplatz.getAll", requestId, "GET_ALL");
+        kafkaTemplate.send("sitzplatzGetAll", requestId, "GET_ALL");
     }
 
     /**
      * Sendet eine Anfrage zur Abfrage eines bestimmten Sitzplatzes per ID.
      */
     public void sendSitzplatzByIdAnfrage(String requestId, Long sitzplatzId) {
-        kafkaTemplate.send("sitzplatz.getById", requestId, sitzplatzId);
+        kafkaTemplate.send("sitzplatzGetById", requestId, sitzplatzId);
     }
 
     /**
      * Sendet eine Anfrage zur Aktualisierung des Sitzplatzstatus.
      */
     public void sendSitzplatzStatusUpdate(String requestId, SitzplatzDTO sitzplatzDTO) {
-        kafkaTemplate.send("sitzplatz.updateStatus", requestId, sitzplatzDTO);
+        kafkaTemplate.send("sitzplatzUpdateStatus", requestId, sitzplatzDTO);
+    }
+
+    public void sendVerfuegbareSitzplaetze() {
+        kafkaTemplate.send("sitzplatzGetVerfügbare", null);
+    }
+
+    public void sendSitzplaetzeByAuffuehrung(Long auffuehrungId) {
+        kafkaTemplate.send("sitzplatzGetByAuffuehrung", auffuehrungId);
+    }
+
+    public void sendSitzplaetzeByKinosaal(Long kinosaalId) {
+        kafkaTemplate.send("sitzplatzGetByKinosaal", kinosaalId);
     }
 }
+

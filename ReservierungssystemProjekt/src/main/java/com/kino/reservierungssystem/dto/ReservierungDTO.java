@@ -13,7 +13,7 @@ import java.util.List;
 public class ReservierungDTO {
     private Long id;
     private Long auffuehrungId;
-    private List<Long> sitzplatzIds;
+    private List<SitzplatzDTO> sitzplaetze;
     private String status;
     private double preis;
     private String email;
