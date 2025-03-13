@@ -13,7 +13,7 @@ import java.util.List;
 public class BuchungDTO {
     private Long id;
     private Long auffuehrungId;
-    private List<Long> sitzplaetze;
+    private List<SitzplatzDTO> sitzplaetze;
     private ZahlungDTO zahlung;
     private String email;
 }

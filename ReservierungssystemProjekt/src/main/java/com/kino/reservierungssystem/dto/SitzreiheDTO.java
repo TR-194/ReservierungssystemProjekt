@@ -13,7 +13,7 @@ import java.util.List;
 public class SitzreiheDTO {
     private Long id;
     private int reihenNummer;
-    private int kinosaalId;
-    private String kategorie;
+    private Long kinosaalId;
+    private int kategorieId;
     private List<SitzplatzDTO> sitzplaetze; // Sitzplätze haben ihre eigene Kategorie
 }

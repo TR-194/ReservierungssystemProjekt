@@ -17,11 +17,11 @@ public class ReservierungProducer {
     }
 
     public void sendReservierungErstellt(ReservierungDTO reservierungDTO) {
-        kafkaTemplate.send("reservierung.create", reservierungDTO);
+        kafkaTemplate.send("reservierungCreate", reservierungDTO);
     }
 
     public void sendReservierungStorniert(Long reservierungsId) {
-        kafkaTemplate.send("reservierung.cancel", reservierungsId);
+        kafkaTemplate.send("reservierungCancel", reservierungsId);
     }
 
     public void sendReservierungUmgewandelt(Long reservierungsId) {
@@ -30,11 +30,11 @@ public class ReservierungProducer {
                 "requestId", requestId,
                 "reservierungsId", reservierungsId
         );
-        kafkaTemplate.send("reservierung.convert", message);
+        kafkaTemplate.send("reservierungConvert", message);
     }
 
     public void sendReservierungByEmail(String email) {
-        kafkaTemplate.send("reservierung.findByEmail", email);
+        kafkaTemplate.send("reservierungFindByEmail", email);
     }
 
 

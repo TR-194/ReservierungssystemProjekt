@@ -18,7 +18,7 @@ public class ReservierungConsumer {
         this.kafkaResponseHandler = kafkaResponseHandler;
     }
 
-    @KafkaListener(topics = "reservierung.getById", groupId = "kino-group")
+    @KafkaListener(topics = "reservierungGetById", groupId = "kino-group")
     public void handleGetReservierungById(Map<String, Object> request) {
         String requestId = (String) request.get("requestId");
         ReservierungDTO reservierungDTO = (ReservierungDTO) request.get("data");
@@ -26,41 +26,41 @@ public class ReservierungConsumer {
         kafkaResponseHandler.sendResponse(requestId, reservierungDTO);
     }
 
-    @KafkaListener(topics = "reservierung.getAll", groupId = "kino-group")
+    @KafkaListener(topics = "reservierungGetAll", groupId = "kino-group")
     public void handleGetAllReservierungen(Map<String, Object> request) {
         String requestId = (String) request.get("requestId");
         kafkaResponseHandler.sendResponse(requestId, request.get("data"));
     }
 
-    @KafkaListener(topics = "reservierung.convertToBuchung", groupId = "kino-group")
+    @KafkaListener(topics = "reservierungConvertToBuchung", groupId = "kino-group")
     public void handleReservierungUmwandlung(Map<String, Object> request) {
         String requestId = (String) request.get("requestId");
         Long reservierungsId = ((Number) request.get("reservierungsId")).longValue();
 
         // Anfrage an die Datenbank weiterleiten
-        kafkaRequestSender.sendRequest("db.reservierung.convert", reservierungsId, Object.class)
+        kafkaRequestSender.sendRequest("dbReservierungConvert", reservierungsId, Object.class)
                 .thenAccept(updatedReservierung -> kafkaResponseHandler.sendResponse(requestId, updatedReservierung));
     }
 
-    @KafkaListener(topics = "reservierung.cancel", groupId = "kino-group")
+    @KafkaListener(topics = "reservierungCancel", groupId = "kino-group")
     public void handleReservierungStorniert(Map<String, Object> request) {
         Long reservierungsId = ((Number) request.get("data")).longValue();
-        kafkaRequestSender.sendRequest("db.reservierung.cancel", reservierungsId, Void.class);
+        kafkaRequestSender.sendRequest("dbReservierungCancel", reservierungsId, Void.class);
     }
 
-    @KafkaListener(topics = "reservierung.create", groupId = "kino-group")
+    @KafkaListener(topics = "reservierungCreate", groupId = "kino-group")
     public void handleReservierungErstellt(Map<String, Object> request) {
         ReservierungDTO reservierungDTO = (ReservierungDTO) request.get("data");
-        kafkaRequestSender.sendRequest("db.reservierung.create", reservierungDTO, Void.class);
+        kafkaRequestSender.sendRequest("dbReservierungCreate", reservierungDTO, Void.class);
     }
 
 
-    @KafkaListener(topics = "reservierung.getByEmail", groupId = "kino-group")
+    @KafkaListener(topics = "reservierungGetByEmail", groupId = "kino-group")
     public void handleReservierungByEmail(Map<String, Object> request) {
         String requestId = (String) request.get("requestId");
         String email = (String) request.get("data");
 
-        kafkaRequestSender.sendRequest("db.reservierung.getByEmail", email, Object.class)
+        kafkaRequestSender.sendRequest("dbReservierungGetByEmail", email, Object.class)
                 .thenAccept(reservierung -> kafkaResponseHandler.sendResponse(requestId, reservierung));
     }
 

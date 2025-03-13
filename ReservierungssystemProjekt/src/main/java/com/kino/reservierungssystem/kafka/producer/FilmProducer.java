@@ -14,22 +14,22 @@ public class FilmProducer {
     }
 
     public void sendFilmAnfrage(String requestId) {
-        kafkaTemplate.send("kino.film.getAll", requestId);
+        kafkaTemplate.send("kinoFilmGetAll", requestId);
     }
 
     public void sendFilmByIdAnfrage(String requestId, Long id) {
-        kafkaTemplate.send("kino.film.getById", requestId, id);
+        kafkaTemplate.send("kinoFilmGetById", requestId, id);
     }
 
     public void sendFilmErstellt(FilmDTO filmDTO) {
-        kafkaTemplate.send("kino.film.create", filmDTO);
+        kafkaTemplate.send("kinoFilmCreate", filmDTO);
     }
 
     public void sendFilmAktualisiert(FilmDTO filmDTO) {
-        kafkaTemplate.send("kino.film.update", filmDTO);
+        kafkaTemplate.send("kinoFilmUpdate", filmDTO);
     }
 
     public void sendFilmGeloescht(Long id) {
-        kafkaTemplate.send("kino.film.delete", id);
+        kafkaTemplate.send("kinoFilmDelete", id);
     }
 }

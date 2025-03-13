@@ -1,212 +1,336 @@
 package com.kinoDbAccess;
 
+import com.kinoDbAccess.dto.*;
 import com.kinoDbAccess.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.support.TransactionTemplate;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.ArrayList;
+import javax.sql.DataSource;
+import java.sql.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class DbAccess {
 
-    public JdbcTemplate getTemplate() {
-        return template;
-    }
+    private final JdbcTemplate jdbcTemplate;
+    private final TransactionTemplate transactionTemplate;
 
     @Autowired
-    public void setTemplate(JdbcTemplate template) {
-        this.template = template;
+    public DbAccess(JdbcTemplate jdbcTemplate, DataSource dataSource) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.transactionTemplate = new TransactionTemplate(new DataSourceTransactionManager(dataSource));
     }
 
-    private JdbcTemplate template;
-
-    public void InsertSaal(Saal saal) {
-        String sql = "INSERT INTO saele (name, freigegeben) values (?, ?);";
-        template.update(sql, saal.getName(), saal.isFreigegeben());
+    // Alle Aufführungen abrufen
+    public List<AuffuehrungDTO> getAllAuffuehrungen() {
+        String sql = "SELECT * FROM Auffuehrung";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> new AuffuehrungDTO(
+                rs.getLong("id"),
+                rs.getDate("datum").toLocalDate(),
+                rs.getTime("uhrzeit").toLocalTime(),
+                rs.getLong("film_id"),
+                rs.getLong("kinosaal_id"),
+                getPreismodellById(rs.getLong("preismodell_id"))
+        ));
     }
 
-    public List<Saal> GetAllSaele() {
-        String sql = "SELECT * FROM saele";
-        return template.query(sql, (rs, rowNum) -> new Saal(rs.getLong("id"), rs.getBoolean("freigegeben"), rs.getString("name")));
+    //⃣Eine Aufführung anhand der ID abrufen
+    public AuffuehrungDTO getAuffuehrungById(Long id) {
+        String sql = "SELECT * FROM Auffuehrung WHERE id = ?";
+        return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> new AuffuehrungDTO(
+                rs.getLong("id"),
+                rs.getDate("datum").toLocalDate(),
+                rs.getTime("uhrzeit").toLocalTime(),
+                rs.getLong("film_id"),
+                rs.getLong("kinosaal_id"),
+                getPreismodellById(rs.getLong("preismodell_id"))
+        ), id);
     }
 
-    public void InsertReihe(Reihe reihe) {
-        String sql = "INSERT INTO reihen (nr, saalId) values (?, ?, ?);";
-        template.update(sql, reihe.getNr(), reihe.getSaalId());
+    //  Neue Aufführung erstellen
+    public void insertAuffuehrung(AuffuehrungDTO auffuehrung) {
+        String sql = "INSERT INTO Auffuehrung (datum, uhrzeit, film_id, kinosaal_id, preismodell_id) VALUES (?, ?, ?, ?, ?)";
+        jdbcTemplate.update(sql, auffuehrung.getDatum(), auffuehrung.getUhrzeit(), auffuehrung.getFilmId(), auffuehrung.getKinosaalId(), auffuehrung.getPreismodell().getId());
     }
 
-    public List<Reihe> GetAllReihen() {
-        String sql = "SELECT * FROM reihen";
-        return template.query(sql, (rs, rowNum) -> new Reihe(rs.getLong("id"), rs.getInt("nr"), rs.getLong("saalId"), Kategorie.valueOf(rs.getString("kategorie"))));
+    // Aufführung löschen
+    public void deleteAuffuehrung(Long id) {
+        String sql = "DELETE FROM Auffuehrung WHERE id = ?";
+        jdbcTemplate.update(sql, id);
     }
 
-    public void InsertPlatz(Platz platz) {
-        String sql = "INSERT INTO plaetze (nr, reiheId) values (?, ?);";
-        template.update(sql, platz.getNr(), platz.getReiheId());
+    // Alle Buchungen abrufen
+    public List<BuchungDTO> getAllBuchungen() {
+        String sql = "SELECT * FROM Buchung";
+
+        return jdbcTemplate.query(sql, (rs, rowNum) -> new BuchungDTO(
+                rs.getLong("id"),
+                rs.getLong("auffuehrung_id"),
+                getSitzplaetzeForBuchung(rs.getLong("id")),  // Holt vollständige Sitzplätze
+                getZahlungByBuchungId(rs.getLong("id")),
+                rs.getString("email")
+        ));
     }
 
-    public List<Platz> GetAllPlaetze() {
-        String sql = "SELECT * FROM reihen";
-        return template.query(sql, (rs, rowNum) -> new Platz(rs.getLong("id"), rs.getInt("nr"), (long)rs.getLong("reiheId")));
+    private List<SitzplatzDTO> getSitzplaetzeForBuchung(Long buchungId) {
+        String sql = "SELECT s.id, s.nummer, s.status, s.sitzreihe_id " +
+                "FROM Sitzplatz s " +
+                "JOIN Buchung_Sitzplatz bs ON s.id = bs.sitzplatz_id " +
+                "WHERE bs.buchung_id = ?";
+
+        return jdbcTemplate.query(sql, (rs, rowNum) -> new SitzplatzDTO(
+                rs.getLong("id"),
+                rs.getInt("nummer"),
+                rs.getString("status"),
+                rs.getLong("sitzreihe_id")
+        ), buchungId);
     }
 
-    public void InsertFilm(Film film) {
-        String sql = "INSERT INTO filme (name, altersbeschraenkung, dauer) values (?, ?, ?);";
-        template.update(sql, film.getName(), film.getAlterbeschraenkung(), film.getDauer());
-    }
 
-    public List<Film> GetAllFilme() {
-        String sql = "SELECT * FROM filme";
-        return template.query(sql, (rs, rowNum) -> new Film(rs.getLong("id"), rs.getString("name"), rs.getString("altersbeschraenkung"), rs.getInt("dauer")));
-    }
 
-    public long InsertPreismodellAndGetId(Preismodell preismodell) throws SQLException {
-        String sql = "INSERT INTO preismodelle (parkettPreis, logePreis, logeMitServicePreis) values (?, ?, ?);";
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        template.update(createPreparedStatementCreator(sql, preismodell), keyHolder);
-        Number generatedId = keyHolder.getKey();
-        if (generatedId != null) {
-            return generatedId.longValue();
-        } else {
-            throw new SQLException("Keine generierte ID gefunden.");
-        }
-    }
+    public void insertBuchung(BuchungDTO buchung) {
+        transactionTemplate.execute(status -> {
+            try {
+                for (SitzplatzDTO sitzplatz : buchung.getSitzplaetze()) {
+                    Long sitzplatzId = sitzplatz.getId();
 
-    public List<Preismodell> GetAllPreismodelle() {
-        String sql = "SELECT * FROM preismodelle";
-        return template.query(sql, (rs, rowNum) -> new Preismodell(rs.getInt("id"), rs.getDouble("parkettPreis"), rs.getDouble("logePreis"), rs.getDouble("logeMitServicePreis")));
-    }
+                    // 1️⃣ Sitzplatz sperren (FOR UPDATE)
+                    String lockQuery = "SELECT status FROM Sitzplatz WHERE id = ? FOR UPDATE";
+                    String statusSitzplatz = jdbcTemplate.queryForObject(lockQuery, String.class, sitzplatzId);
 
-    public void InsertAuffuehrung(Auffuehrung auffuehrung) {
-        String sql = "INSERT INTO auffuehrungen (filmId, datum, uhrzeit, saalId, preismodellId) values (?, ?, ?, ?, ?);";
-        template.update(sql, auffuehrung.getFilmId(), auffuehrung.getDatum(), auffuehrung.getUhrzeit(), auffuehrung.getSaalId(), auffuehrung.getPreismodellId());
-    }
+                    if (!"frei".equals(statusSitzplatz)) {
+                        throw new IllegalStateException("Sitzplatz " + sitzplatzId + " ist nicht mehr verfügbar!");
+                    }
 
-    public List<Auffuehrung> GetAllAuffuehrungen() {
-        String sql = "SELECT * FROM auffuehrungen";
-        return template.query(sql, (rs, rowNum) -> new Auffuehrung(rs.getInt("id"), rs.getObject("datum", LocalDate.class), rs.getObject("uhrzeit", LocalTime.class), rs.getInt("saalId"), rs.getInt("preismodellId")));
-    }
+                    // 2️⃣ Buchung in die DB einfügen
+                    String insertQuery = "INSERT INTO Buchung (auffuehrung_id, email, zahlung_id) VALUES (?, ?, ?)";
+                    jdbcTemplate.update(insertQuery, buchung.getAuffuehrungId(), buchung.getEmail(), buchung.getZahlung().getId());
 
-    public boolean InsertReservierung(Reservierung reservierung) {
-        String sql = "INSERT INTO platzzugehoerigkeiten (auffuehrungsId, platzId, email) values ";
-        ArrayList<Object> argsList = new ArrayList<Object>();
-        for (long platzId : reservierung.getPlatzIds()) {
-            sql = sql + "(?, ?, ?), ";
-            argsList.add(reservierung.getAuffuehrungId());
-            argsList.add(platzId);
-            argsList.add(reservierung.getEmail());
-        }
-        sql = sql.substring(0, sql.length() - 2) + ";";
-        Object[] args = argsList.toArray();
-        try {
-            template.update(sql, args);
-            String sql2 = "INSERT INTO reservierungen (auffuehrungId, status, email) values (?, ?, ?);";
-            template.update(sql2, reservierung.getAuffuehrungId(), reservierung.getStatus(), reservierung.getEmail());
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
+                    // 3️⃣ Sitzplatz als "gebucht" markieren
+                    String updateQuery = "UPDATE Sitzplatz SET status = 'gebucht' WHERE id = ?";
+                    jdbcTemplate.update(updateQuery, sitzplatzId);
+                }
 
-    public List<Reservierung> GetAllReservierungen() {
-        String sql = "SELECT * FROM reservierungen";
-        List<Reservierung> reservierungen = template.query(sql, (rs, rowNum) -> new Reservierung(rs.getInt("id"), rs.getInt("auffuehrungId"), Status.valueOf(rs.getString("status")), rs.getString("email")));
-        for (Reservierung reservierung : reservierungen) {
-            String sql2 = "SELECT * FROM platzzugehoerigkeit WHERE auffuehrungId = ? AND email = ?;";
-            List<Long> result = template.query(sql2, (rs, rowNum) -> rs.getLong("platzId"), reservierung.getAuffuehrungId(), reservierung.getEmail());
-            reservierung.setPlatzIds(result);
-        }
-        return reservierungen;
-    }
-
-    public void UpdateReservierungStatus(long reservierungId, Status status) {
-        String sql = "UPDATE reservierungen SET status = ? WHERE id = ?;";
-        template.update(sql, status, reservierungId);
-    }
-
-    public void DeleteReservierung(long reservierungId) {
-        String sql = "DELETE FROM reservierungen WHERE id = ? AND status = 'RESERVIERT';";
-        template.update(sql, reservierungId);
-    }
-
-    public List<Reservierung> GetReservierungenByEmail(String email) {
-        String sql = "SELECT * FROM reservierungen WHERE email = ?";
-        List<Reservierung> reservierungen = template.query(sql, (rs, rowNum) -> new Reservierung(rs.getLong("id"), rs.getLong("auffuehrungId"), Status.valueOf(rs.getString("status")), rs.getString("email")), email);
-        for (Reservierung reservierung : reservierungen) {
-            String sql2 = "SELECT * FROM platzzugehoerigkeit WHERE auffuehrungId = ? AND email = ?;";
-            List<Long> result = template.query(sql2, (rs, rowNum) -> rs.getLong("platzId"), reservierung.getAuffuehrungId(), reservierung.getEmail());
-            reservierung.setPlatzIds(result);
-        }
-        return reservierungen;
-    }
-
-    private PreparedStatementCreator createPreparedStatementCreator(String sql, Preismodell preismodell) {
-        return new PreparedStatementCreator() {
-            @Override
-            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                PreparedStatement ps = con.prepareStatement(sql, new String[]{"id"});
-                ps.setDouble(1, preismodell.getParkettPreis());
-                ps.setDouble(2, preismodell.getLogePreis());
-                ps.setDouble(3, preismodell.getLogeMitServicePreis());
-                return ps;
+            } catch (Exception e) {
+                status.setRollbackOnly();  // Transaktion rückgängig machen
+                throw e;
             }
-        };
+
+            return null;
+        });
     }
 
-    private PreparedStatementCreator createSaalPreparedStatementCreator(String sql, Saal saal) {
-        return new PreparedStatementCreator() {
-            @Override
-            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                PreparedStatement ps = con.prepareStatement(sql, new String[]{"id"});
-                ps.setString(1, saal.getName());
-                return ps;
-            }
-        };
+    //  Buchung löschen
+    public void deleteBuchung(Long id) {
+        String sql = "DELETE FROM Buchung WHERE id = ?";
+        jdbcTemplate.update(sql, id);
     }
 
-    public long InsertSaalAndGetId(Saal saal) throws SQLException {
-        String sql = "INSERT INTO saele (name) values (?);";
+    // Alle Filme abrufen
+    public List<FilmDTO> getAllFilme() {
+        String sql = "SELECT * FROM Film";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> new FilmDTO(
+                rs.getLong("id"),
+                rs.getString("titel"),
+                rs.getString("altersbeschraenkung"),
+                rs.getInt("dauer")
+        ));
+    }
+
+    //  Neuen Film hinzufügen
+    public void insertFilm(FilmDTO film) {
+        String sql = "INSERT INTO Film (titel, altersbeschraenkung, dauer) VALUES (?, ?, ?)";
+        jdbcTemplate.update(sql, film.getTitel(), film.getAlterbeschraenkung(), film.getDauer());
+    }
+
+    public Long insertKinosaal(KinosaalDTO kinosaal) {
+        String sql = "INSERT INTO Kinosaal (name, freigegeben) VALUES (?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        template.update(createSaalPreparedStatementCreator(sql, saal), keyHolder);
-        Number generatedId = keyHolder.getKey();
-        if (generatedId != null) {
-            return generatedId.longValue();
-        } else {
-            throw new SQLException("Keine generierte ID gefunden.");
-        }
+
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            ps.setString(1, kinosaal.getName());
+            ps.setBoolean(2, kinosaal.isFreigegeben());
+            return ps;
+        }, keyHolder);
+
+        return keyHolder.getKey().longValue();
     }
 
-    private PreparedStatementCreator createReihePreparedStatementCreator(String sql, Reihe reihe) {
-        return new PreparedStatementCreator() {
-            @Override
-            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                PreparedStatement ps = con.prepareStatement(sql, new String[]{"id"});
-                ps.setInt(1, reihe.getNr());
-                ps.setLong(2, reihe.getSaalId());
-                return ps;
+    // Reservierung erstellen
+    public void insertReservierung(ReservierungDTO reservierung) {
+        transactionTemplate.execute(status -> {
+            try {
+                // Reservierung in die DB einfügen und ID abrufen
+                String insertReservierungQuery = "INSERT INTO Reservierung (auffuehrung_id, email, name, preis, status) VALUES (?, ?, ?, ?, ?)";
+                KeyHolder keyHolder = new GeneratedKeyHolder();
+                jdbcTemplate.update(connection -> {
+                    PreparedStatement ps = connection.prepareStatement(insertReservierungQuery, Statement.RETURN_GENERATED_KEYS);
+                    ps.setLong(1, reservierung.getAuffuehrungId());
+                    ps.setString(2, reservierung.getEmail());
+                    ps.setString(3, reservierung.getName());
+                    ps.setDouble(4, reservierung.getPreis());
+                    ps.setString(5, reservierung.getStatus());
+                    return ps;
+                }, keyHolder);
+
+                Long reservierungId = keyHolder.getKey().longValue();
+
+                //  Alle Sitzplätze sichern
+                for (SitzplatzDTO sitzplatz : reservierung.getSitzplaetze()) {
+                    Long sitzplatzId = sitzplatz.getId();
+
+                    //Sitzplatz sperren (FOR UPDATE)
+                    String lockQuery = "SELECT status FROM Sitzplatz WHERE id = ? FOR UPDATE";
+                    String statusSitzplatz = jdbcTemplate.queryForObject(lockQuery, String.class, sitzplatzId);
+
+                    if (!"frei".equals(statusSitzplatz)) {
+                        throw new IllegalStateException("Sitzplatz " + sitzplatzId + " ist nicht mehr verfügbar!");
+                    }
+
+                    // Sitzplatz mit der Reservierung verknüpfen
+                    String insertSitzplatzReservierungQuery = "INSERT INTO Reservierung_Sitzplatz (reservierung_id, sitzplatz_id) VALUES (?, ?)";
+                    jdbcTemplate.update(insertSitzplatzReservierungQuery, reservierungId, sitzplatzId);
+
+                    // Sitzplatz als "reserviert" markieren
+                    String updateQuery = "UPDATE Sitzplatz SET status = 'reserviert' WHERE id = ?";
+                    jdbcTemplate.update(updateQuery, sitzplatzId);
+                }
+
+            } catch (Exception e) {
+                status.setRollbackOnly();  // Transaktion rückgängig machen
+                throw e;
             }
-        };
+
+            return null;
+        });
     }
 
-    public long InsertReiheAndGetId(Reihe reihe) throws SQLException {
-        String sql = "INSERT INTO reihen (nr, saalId) values (?);";
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        template.update(createReihePreparedStatementCreator(sql, reihe), keyHolder);
-        Number generatedId = keyHolder.getKey();
-        if (generatedId != null) {
-            return generatedId.longValue();
-        } else {
-            throw new SQLException("Keine generierte ID gefunden.");
-        }
+    // Reservierung stornieren
+    public void deleteReservierung(Long reservierungId) {
+        String sql = "DELETE FROM Reservierung WHERE id = ?";
+        jdbcTemplate.update(sql, reservierungId);
     }
+
+    // Sitzplatz einer Aufführung abrufen
+    public List<SitzplatzDTO> getSitzplaetzeByAuffuehrung(Long auffuehrungId) {
+        String sql = "SELECT * FROM Sitzplatz WHERE id IN (SELECT sitzplatz_id FROM Reservierung_Sitzplatz WHERE reservierung_id IN (SELECT id FROM Reservierung WHERE auffuehrung_id = ?))";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> new SitzplatzDTO(
+                rs.getLong("id"),
+                rs.getInt("nummer"),
+                rs.getString("status"),
+                rs.getLong("sitzreihe_id")
+        ), auffuehrungId);
+    }
+
+    // Zahlung anhand der Buchungs-ID abrufen
+    private ZahlungDTO getZahlungByBuchungId(Long buchungId) {
+        String sql = "SELECT * FROM Zahlung WHERE buchung_id = ?";
+        return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> new ZahlungDTO(
+                rs.getLong("id"),
+                rs.getDouble("betrag"),
+                rs.getString("filmtitel"),
+                rs.getLong("auffuehrung_id"),
+                rs.getDate("zahlungsdatum").toLocalDate(),
+                rs.getLong("buchung_id")
+        ), buchungId);
+    }
+
+    // Sitzplatz-IDs einer Buchung abrufen
+    private List<Long> getSitzplatzIdsForBuchung(Long buchungId) {
+        String sql = "SELECT sitzplatz_id FROM Buchung_Sitzplatz WHERE buchung_id = ?";
+        return jdbcTemplate.queryForList(sql, Long.class, buchungId);
+    }
+
+    // Preismodell anhand der ID abrufen
+    private PreismodellDTO getPreismodellById(Long id) {
+        String sql = "SELECT * FROM Preismodell WHERE id = ?";
+        return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> new PreismodellDTO(
+                rs.getLong("id"),
+                rs.getDouble("loge_mit_service_preis"),
+                rs.getDouble("loge_preis"),
+                rs.getDouble("parkett_preis")
+        ), id);
+    }
+
+    public List<SitzplatzDTO> getAllSitzplaetze() {
+        String sql = "SELECT * FROM Sitzplatz";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> new SitzplatzDTO(
+                rs.getLong("id"),
+                rs.getInt("nummer"),
+                rs.getString("status"),
+                rs.getLong("sitzreihe_id")
+        ));
+    }
+
+    public void convertReservierungToBuchung(Long reservierungsId) {
+        String sql = "UPDATE Reservierung SET status = 'GEBUCHT' WHERE id = ?";
+        jdbcTemplate.update(sql, reservierungsId);
+    }
+
+    public List<ReservierungDTO> getAllReservierungen() {
+        String sql = "SELECT * FROM Reservierung";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> new ReservierungDTO(
+                rs.getLong("id"),
+                rs.getLong("auffuehrung_id"),
+                getSitzplaetzeForReservierung(rs.getLong("id")),  // Jetzt vollständige Sitzplatz-Objekte abrufen
+                rs.getString("status"),
+                rs.getDouble("preis"),
+                rs.getString("email"),
+                rs.getString("name")
+        ));
+    }
+
+    /**
+     * Holt alle Sitzplätze einer Reservierung als vollständige `SitzplatzDTO`-Objekte.
+     */
+    private List<SitzplatzDTO> getSitzplaetzeForReservierung(Long reservierungId) {
+        String sql = "SELECT s.id, s.nummer, s.status, s.sitzreihe_id " +
+                "FROM Sitzplatz s " +
+                "JOIN Reservierung_Sitzplatz rs ON s.id = rs.sitzplatz_id " +
+                "WHERE rs.reservierung_id = ?";
+
+        return jdbcTemplate.query(sql, (rs, rowNum) -> new SitzplatzDTO(
+                rs.getLong("id"),
+                rs.getInt("nummer"),
+                rs.getString("status"),
+                rs.getLong("sitzreihe_id")
+        ), reservierungId);
+    }
+
+    // Hilfsmethode: Holt die Sitzplätze einer Reservierung
+    private List<Long> getSitzplatzIdsForReservierung(Long reservierungId) {
+        String sql = "SELECT sitzplatz_id FROM Reservierung_Sitzplatz WHERE reservierung_id = ?";
+        return jdbcTemplate.queryForList(sql, Long.class, reservierungId);
+    }
+
+    public Long insertSitzreihe(SitzreiheDTO reihe) {
+        String sql = "INSERT INTO Sitzreihe (reihen_nummer, kategorie_id, kinosaal_id) VALUES (?, ?, ?)";
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            ps.setInt(1, reihe.getReihenNummer());
+            ps.setLong(2, reihe.getKategorieId());
+            ps.setLong(3, reihe.getKinosaalId());
+            return ps;
+        }, keyHolder);
+
+        return keyHolder.getKey().longValue();
+    }
+
+    public void insertSitzplatz(SitzplatzDTO platz) {
+        String sql = "INSERT INTO Sitzplatz (nummer, status, sitzreihe_id) VALUES (?, ?, ?)";
+
+        jdbcTemplate.update(sql, platz.getNummer(), platz.getStatus(), platz.getSitzreiheId());
+    }
+
+
+
 }

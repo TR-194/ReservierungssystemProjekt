@@ -1,6 +1,5 @@
 package com.kinoDbAccess.dto;
 
-import com.kinoDbAccess.model.Kategorie;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -14,6 +13,7 @@ import java.util.List;
 public class SitzreiheDTO {
     private Long id;
     private int reihenNummer;
+    private Long kinosaalId;
+    private int kategorieId;
     private List<SitzplatzDTO> sitzplaetze; // Sitzplätze haben ihre eigene Kategorie
-    private Kategorie kategorie;
 }

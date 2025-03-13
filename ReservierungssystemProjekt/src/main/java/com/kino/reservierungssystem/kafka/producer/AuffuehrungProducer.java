@@ -18,18 +18,18 @@ public class AuffuehrungProducer {
     }
 
     public void sendAuffuehrungByIdAnfrage(String requestId, Long id) {
-        kafkaTemplate.send("kino.auffuehrung.getById", requestId, id);
+        kafkaTemplate.send("kinoAuffuehrungGetById", requestId, id);
     }
 
     public void sendAuffuehrungErstellt(AuffuehrungDTO auffuehrungDTO) {
-        kafkaTemplate.send("kino.auffuehrung.create", auffuehrungDTO);
+        kafkaTemplate.send("kinoAuffuehrungCreate", auffuehrungDTO);
     }
 
     public void sendAuffuehrungAktualisiert(AuffuehrungDTO auffuehrungDTO) {
-        kafkaTemplate.send("kino.auffuehrung.update", auffuehrungDTO);
+        kafkaTemplate.send("kinoAuffuehrungUpdate", auffuehrungDTO);
     }
 
     public void sendAuffuehrungGeloescht(Long id) {
-        kafkaTemplate.send("kino.auffuehrung.delete", id);
+        kafkaTemplate.send("kinoAuffuehrungDelete", id);
     }
 }

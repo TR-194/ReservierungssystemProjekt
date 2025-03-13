@@ -19,17 +19,17 @@ public class KinosaalProducer {
      * Sendet einen neuen Kinosaal, wenn einer erstellt wurde.
      */
     public void sendKinosaalErstellt(KinosaalDTO kinosaalDTO) {
-        kafkaTemplate.send("kinosaal.created", kinosaalDTO);
+        kafkaTemplate.send("kinosaalCreated", kinosaalDTO);
     }
 
     /**
      * Sendet die ID eines gelöschten Kinosaals über ein separates Topic.
      */
     public void sendKinosaalGeloescht(Long id) {
-        kafkaIdTemplate.send("kinosaal.deleted", id);
+        kafkaIdTemplate.send("kinosaalDeleted", id);
     }
 
     public void sendKinosaalToggleFreigabe(Long id) {
-        kafkaIdTemplate.send("kinosaal.toggleFreigabe", id);
+        kafkaIdTemplate.send("kinosaalToggleFreigabe", id);
     }
 }

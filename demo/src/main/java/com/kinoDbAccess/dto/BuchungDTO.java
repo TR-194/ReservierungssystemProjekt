@@ -12,8 +12,8 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class BuchungDTO {
     private Long id;
-    private String email;
     private Long auffuehrungId;
-    private List<Long> sitzplaetze;
-    private Object zahlung;
+    private List<SitzplatzDTO> sitzplaetze;
+    private ZahlungDTO zahlung;
+    private String email;
 }
