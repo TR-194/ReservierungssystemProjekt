@@ -21,7 +21,7 @@ export class AdminAuffuehrungListComponent implements OnInit {
   }
 
   loadAuffuehrungen() {
-    this.kafkaService.sendRequest<Auffuehrung[]>('auffuehrung.getAll')
+    this.kafkaService.sendRequest<Auffuehrung[]>('auffuehrungGetAll')
       .subscribe(
         (data: Auffuehrung[]) => {
           this.auffuehrungen = data;
@@ -31,7 +31,7 @@ export class AdminAuffuehrungListComponent implements OnInit {
   }
 
   deleteAuffuehrung(id: number) {
-    this.kafkaService.sendRequest<void>('auffuehrung.delete', id)
+    this.kafkaService.sendRequest<void>('auffuehrungDelete', id)
       .subscribe(
         () => this.loadAuffuehrungen(),
         error => console.error('Fehler beim Löschen der Aufführung:', error)

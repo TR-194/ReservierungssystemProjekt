@@ -44,7 +44,7 @@ export class ReservierungFormComponent implements OnInit {
   }
 
   ladeVerfügbareSitzplätze(): void {
-    this.kafkaService.sendRequest<Sitzplatz[]>('sitzplatz.getVerfügbare')
+    this.kafkaService.sendRequest<Sitzplatz[]>('sitzplatzGetVerfügbare')
       .subscribe(sitzplaetze => {
         this.verfügbareSitzplätze = sitzplaetze;
       });
@@ -56,7 +56,7 @@ export class ReservierungFormComponent implements OnInit {
       console.log('Reservierung:', reservierung);
 
       // Reservierung über Kafka senden
-      this.kafkaService.sendRequest('reservierung.create', reservierung)
+      this.kafkaService.sendRequest('reservierungCreate', reservierung)
         .subscribe(
           response => console.log('Reservierung erfolgreich:', response),
           error => console.error('Fehler bei der Reservierung:', error)

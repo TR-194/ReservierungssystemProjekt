@@ -23,7 +23,7 @@ export class AdminStatistikFilmComponent implements OnInit {
   }
 
   ladeFilmStatistik(): void {
-    this.kafkaService.sendRequest<FilmStatistik[]>('statistik.getEinnahmenProFilm')
+    this.kafkaService.sendRequest<FilmStatistik[]>('statistikGetEinnahmenProFilm')
       .subscribe(
         data => this.filmeStatistik = data,
         error => console.error('Fehler beim Laden der Filmstatistik:', error)

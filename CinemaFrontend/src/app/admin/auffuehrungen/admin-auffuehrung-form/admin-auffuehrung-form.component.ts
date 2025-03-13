@@ -42,20 +42,20 @@ export class AdminAuffuehrungFormComponent implements OnInit {
   }
 
   loadFilme() {
-    this.kafkaService.sendRequest<Film[]>('film.getAll').subscribe(data => {
+    this.kafkaService.sendRequest<Film[]>('filmGetAll').subscribe(data => {
       this.filme = data;
     });
   }
 
   loadKinosaele() {
-    this.kafkaService.sendRequest<Kinosaal[]>('kinosaal.getAll').subscribe(data => {
+    this.kafkaService.sendRequest<Kinosaal[]>('kinosaalGetAll').subscribe(data => {
       this.kinosaele = data;
     });
   }
 
   submitForm() {
     if (this.auffuehrung.filmId && this.auffuehrung.kinosaalId) {
-      this.kafkaService.sendRequest<void>('auffuehrung.create', this.auffuehrung).subscribe(() => {
+      this.kafkaService.sendRequest<void>('auffuehrungCreate', this.auffuehrung).subscribe(() => {
         this.router.navigate(['/admin/auffuehrungen']);
       });
     } else {

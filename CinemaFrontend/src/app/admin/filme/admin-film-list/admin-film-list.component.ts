@@ -21,7 +21,7 @@ export class AdminFilmListComponent implements OnInit {
   }
 
   ladeFilme(): void {
-    this.kafkaService.sendRequest<Film[]>('film.getAll').subscribe(
+    this.kafkaService.sendRequest<Film[]>('filmGetAll').subscribe(
       (data: Film[]) => this.filme = data,
       error => console.error('Fehler beim Laden der Filme', error)
     );
@@ -36,7 +36,7 @@ export class AdminFilmListComponent implements OnInit {
   }
 
   loescheFilm(id: number): void {
-    this.kafkaService.sendRequest<void>('film.delete', id).subscribe(
+    this.kafkaService.sendRequest<void>('filmDelete', id).subscribe(
       () => this.ladeFilme(),
       error => console.error('Fehler beim Löschen des Films', error)
     );

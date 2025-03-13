@@ -1,23 +1,65 @@
 <div *ngIf="auffuehrung">
   <h2>{{ film?.titel }}</h2>
-  <p>Datum: {{ auffuehrung.datum }}</p>
-  <p>Uhrzeit: {{ auffuehrung.uhrzeit }}</p>
-  <p>Saal: {{ kinosaal?.name }}</p>
+  <p><strong>Datum:</strong> {{ auffuehrung.datum }}</p>
+  <p><strong>Uhrzeit:</strong> {{ auffuehrung.uhrzeit }}</p>
+  <p><strong>Saal:</strong> {{ kinosaal?.name }}</p>
 
   <h3>Sitzplätze auswählen</h3>
-  <div class="sitzplaetze">
-    <div *ngFor="let sitzplatz of sitzplaetze">
-      <button 
-        (click)="onSitzplatzAuswaehlen(sitzplatz.id)"
-        [class.selected]="ausgewaehlteSitze.includes(sitzplatz.id)"
-        [disabled]="sitzplatz.status !== 'frei'">
-        {{ sitzplatz.nummer }}
-      </button>
+  
+  <div class="sitzplan">
+    <div *ngFor="let reihe of sitzreihen">
+      <div class="reihe-label">Reihe {{ reihe.reihenNummer }} - {{ getKategorieName(reihe.kategorieId) }}</div>
+      <div class="sitzreihe">
+        <button 
+          *ngFor="let sitzplatz of reihe.sitzplaetze"
+          (click)="onSitzplatzAuswaehlen(sitzplatz)"
+          [class.selected]="ausgewaehlteSitze.includes(sitzplatz)"
+          [disabled]="sitzplatz.status !== 'frei'">
+          {{ sitzplatz.nummer }}
+        </button>
+      </div>
     </div>
   </div>
 
   <h3>Gesamtpreis: {{ gesamtpreis | currency:'EUR' }}</h3>
 
-  <button (click)="reservieren()">Reservieren</button>
-  <button (click)="buchen()">Buchen</button>
+  <button class="btn btn-warning" (click)="reservieren()">Reservieren</button>
+  <button class="btn btn-success" (click)="buchen()">Buchen</button>
 </div>
+
+<!-- Sitzplatz Styles -->
+<style>
+  .sitzplan {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .reihe-label {
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+
+  .sitzreihe {
+    display: flex;
+    gap: 5px;
+  }
+
+  .sitzreihe button {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #000;
+    background-color: lightgray;
+    cursor: pointer;
+  }
+
+  .sitzreihe button.selected {
+    background-color: blue;
+    color: white;
+  }
+
+  .sitzreihe button:disabled {
+    background-color: red;
+    cursor: not-allowed;
+  }
+</style>

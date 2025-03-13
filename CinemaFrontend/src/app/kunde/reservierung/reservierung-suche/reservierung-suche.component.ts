@@ -54,7 +54,7 @@ export class ReservierungSucheComponent {
   onBuchen() {
     if (this.reservierungsDaten) {
       console.log('Reservierung in Buchung umwandeln:', this.reservierungsDaten);
-      this.kafkaService.sendRequest<Reservierung>('reservierung.convertToBuchung', { reservierungsId: this.reservierungsDaten.id })
+      this.kafkaService.sendRequest<Reservierung>('reservierungConvertToBuchung', { reservierungsId: this.reservierungsDaten.id })
         .subscribe(
           (updatedReservierung: Reservierung) => {
             this.reservierungsDaten = updatedReservierung;
@@ -69,7 +69,7 @@ export class ReservierungSucheComponent {
   onStornieren() {
     if (this.reservierungsDaten) {
       console.log('Reservierung stornieren:', this.reservierungsDaten);
-      this.kafkaService.sendRequest<void>('reservierung.cancel', { reservierungsId: this.reservierungsDaten.id })
+      this.kafkaService.sendRequest<void>('reservierungCancel', { reservierungsId: this.reservierungsDaten.id })
         .subscribe(
           () => {
             this.reservierungGefunden = false;

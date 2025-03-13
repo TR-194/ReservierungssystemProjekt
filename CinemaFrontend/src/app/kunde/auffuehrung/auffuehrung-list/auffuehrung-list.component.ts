@@ -25,7 +25,7 @@ export class AuffuehrungListComponent implements OnInit {
   }
 
   ladeAuffuehrungen(): void {
-    this.kafkaService.sendRequest<Auffuehrung[]>('auffuehrung.getAll')
+    this.kafkaService.sendRequest<Auffuehrung[]>('auffuehrungGetAll')
       .subscribe(
         (data: Auffuehrung[]) => {
           this.auffuehrungen = data;
@@ -38,7 +38,7 @@ export class AuffuehrungListComponent implements OnInit {
   ladeFilme(filmIds: number[]): void {
     filmIds.forEach(filmId => {
       if (!this.filme.has(filmId)) { // Verhindert doppelte Anfragen
-        this.kafkaService.sendRequest<Film>('film.getById', filmId)
+        this.kafkaService.sendRequest<Film>('filmGetById', filmId)
           .subscribe(
             film => this.filme.set(film.id, film.titel),
             error => console.error(`Fehler beim Laden des Films mit ID ${filmId}`, error)

@@ -22,7 +22,7 @@ export class AdminKinosaalListComponent implements OnInit {
   }
 
   ladeKinosaele(): void {
-    this.kafkaService.sendRequest<Kinosaal[]>('kinosaal.getAll')
+    this.kafkaService.sendRequest<Kinosaal[]>('kinosaalGetAll')
       .subscribe({
         next: (data) => this.kinosaele = data,
         error: () => this.errorMessage = 'Fehler beim Laden der Kinosäle.'
@@ -31,7 +31,7 @@ export class AdminKinosaalListComponent implements OnInit {
 
   loescheKinosaal(id: number): void {
     if (confirm('Möchtest du diesen Kinosaal wirklich löschen?')) {
-      this.kafkaService.sendRequest<void>('kinosaal.delete', id).subscribe({
+      this.kafkaService.sendRequest<void>('kinosaalDelete', id).subscribe({
         next: () => this.ladeKinosaele(),
         error: () => this.errorMessage = 'Fehler beim Löschen des Kinosaals.'
       });
@@ -39,7 +39,7 @@ export class AdminKinosaalListComponent implements OnInit {
   }
 
   toggleFreigabe(id: number): void {
-    this.kafkaService.sendRequest<void>('kinosaal.toggleFreigabe', id).subscribe({
+    this.kafkaService.sendRequest<void>('kinosaalToggleFreigabe', id).subscribe({
       next: () => this.ladeKinosaele(),
       error: () => this.errorMessage = 'Fehler beim Ändern des Freigabestatus.'
     });

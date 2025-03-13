@@ -24,7 +24,7 @@ export class AdminStatistikAuffuehrungComponent implements OnInit {
   }
 
   ladeAuffuehrungsStatistik(): void {
-    this.kafkaService.sendRequest<AuffuehrungStatistik[]>('statistik.getEinnahmenProAuffuehrung')
+    this.kafkaService.sendRequest<AuffuehrungStatistik[]>('statistikGetEinnahmenProAuffuehrung')
       .subscribe(
         data => this.auffuehrungenStatistik = data,
         error => console.error('Fehler beim Laden der Aufführungsstatistik:', error)
