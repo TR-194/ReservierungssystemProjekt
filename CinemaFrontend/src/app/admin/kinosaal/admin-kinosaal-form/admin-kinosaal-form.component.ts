@@ -6,7 +6,7 @@ import { Kinosaal } from 'src/app/shared/models/kinosaal.model';
 import { Router } from '@angular/router';
 import { Sitzreihe } from 'src/app/shared/models/sitzreihe.model';
 import { Sitzplatz } from 'src/app/shared/models/sitzplatz.model';
-import { KategorieTyp } from 'src/app/shared/models/sitzkategorie.model';
+import { Sitzkategorie } from 'src/app/shared/models/sitzkategorie.model';
 
 @Component({
   selector: 'app-admin-kinosaal-form',
@@ -23,11 +23,14 @@ export class AdminKinosaalFormComponent {
   name = '';
   freigegeben = false;
   sitzreihen: Sitzreihe[] = [];
-  sitzreihenIds: number[] = [];
-  kategorieTypen = Object.values(KategorieTyp);
+  kategorieTypen: Sitzkategorie[] = [
+    { id: 1, name: 'PARKETT', preis: 8.00 },
+    { id: 2, name: 'LOGE', preis: 10.00 },
+    { id: 3, name: 'LOGE_MIT_SERVICE', preis: 15.00 }
+  ];
   kinosaalId = 0;
   anzahlSitzplaetze = 0;
-  ausgewaehlteKategorie: KategorieTyp = KategorieTyp.PARKETT;
+  ausgewaehlteKategorie = 1; // Standardmäßig PARKETT
 
   constructor(private kafkaService: KafkaService, private router: Router) {}
 
@@ -36,32 +39,27 @@ export class AdminKinosaalFormComponent {
       id: this.kinosaalId, 
       name: this.name, 
       freigegeben: this.freigegeben, 
-      sitzreihenIds: [...this.sitzreihenIds] 
+      sitzreihen: this.sitzreihen.map(reihe => ({
+        id: 0,  // ID wird vom Backend generiert
+        reihenNummer: reihe.reihenNummer,
+        kategorieId: reihe.kategorieId,
+        sitzplaetze: reihe.sitzplaetze.map(sitz => ({
+          id: 0,  // ID wird vom Backend generiert
+          nummer: sitz.nummer,
+          status: sitz.status
+        }))
+      }))
     };
 
-    this.kafkaService.sendRequest<Kinosaal>('kinosaal.create', neuerSaal).subscribe(
-      (gespeicherterSaal) => {
-        this.kinosaalId = gespeicherterSaal.id;
-        this.speichereSitzreihen();
-      },
+    const nachricht = {
+      eventType: "kinosaalCreate",
+      data: neuerSaal
+    };
+
+    this.kafkaService.sendRequest('kinosaalCreate', nachricht).subscribe(
+      () => this.router.navigate(['/admin/kinosaal']),
       error => console.error('Fehler beim Speichern des Kinosaals', error)
     );
-  }
-
-  speichereSitzreihen(): void {
-    this.sitzreihen.forEach((reihe) => {
-      reihe.kinosaalId = this.kinosaalId;
-
-      this.kafkaService.sendRequest<Sitzreihe>('sitzreihe.create', reihe).subscribe(
-        (gespeicherteReihe) => {
-          reihe.id = gespeicherteReihe.id;
-          reihe.sitzplatzIds = gespeicherteReihe.sitzplatzIds;
-        },
-        error => console.error('Fehler beim Speichern der Sitzreihe', error)
-      );
-    });
-
-    this.router.navigate(['/admin/kinosaal']);
   }
 
   hinzufuegenSitzreihe(): void {
@@ -70,35 +68,28 @@ export class AdminKinosaalFormComponent {
       return;
     }
 
-    const neueSitzreiheId = this.sitzreihen.length + 1;
-    this.sitzreihenIds.push(neueSitzreiheId);
-
-    const neueSitzplaetze: Sitzplatz[] = Array.from({ length: this.anzahlSitzplaetze }, (_, i) => ({
-      id: 0, 
-      nummer: i + 1,
-      status: 'frei' as const,
-      sitzreiheId: neueSitzreiheId 
-    }));
-
     const neueReihe: Sitzreihe = {
-      id: neueSitzreiheId,
+      id: 0, // ID wird vom Backend gesetzt
       reihenNummer: this.sitzreihen.length + 1,
       kategorieId: this.ausgewaehlteKategorie,
-      sitzplatzIds: neueSitzplaetze.map(sp => sp.id),
-      kinosaalId: this.kinosaalId
+      sitzplaetze: Array.from({ length: this.anzahlSitzplaetze }, (_, i) => ({
+        id: 0,
+        nummer: i + 1,
+        status: 'frei'
+      }))
     };
 
     this.sitzreihen.push(neueReihe);
   }
 
   entferneSitzreihe(index: number): void {
-    this.sitzreihenIds.splice(index, 1);
     this.sitzreihen.splice(index, 1);
     this.sitzreihen.forEach((reihe, i) => reihe.reihenNummer = i + 1);
   }
 
-  getSitzplaetzeAnzahl(reihe: Sitzreihe): number[] {
-    return Array.from({ length: reihe.sitzplatzIds.length || this.anzahlSitzplaetze });
+  getKategorieName(kategorieId: number): string {
+    const kategorie = this.kategorieTypen.find(k => k.id === kategorieId);
+    return kategorie ? kategorie.name : 'Unbekannt';
   }
 
   navigateToKinosaal() {

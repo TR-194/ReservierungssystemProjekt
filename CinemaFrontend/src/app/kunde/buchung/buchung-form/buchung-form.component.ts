@@ -37,7 +37,7 @@ export class BuchungFormComponent implements OnInit {
   onSubmit() {
     if (this.buchungForm.valid) {
       console.log('Buchung:', this.buchungForm.value);
-      this.kafkaService.sendRequest('buchung.create', this.buchungForm.value)
+      this.kafkaService.sendRequest('buchungCreate', this.buchungForm.value)
         .subscribe(
           response => console.log('Buchung erfolgreich:', response),
           error => console.error('Fehler bei der Buchung:', error)

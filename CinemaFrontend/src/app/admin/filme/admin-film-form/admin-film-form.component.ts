@@ -25,7 +25,7 @@ export class AdminFilmFormComponent implements OnInit {
   ngOnInit(): void {
     this.filmId = this.route.snapshot.params['id'];
     if (this.filmId) {
-      this.kafkaService.sendRequest<Film>('film.getById', this.filmId).subscribe(
+      this.kafkaService.sendRequest<Film>('filmGetById', this.filmId).subscribe(
         (data: Film) => this.film = data,
         error => console.error('Fehler beim Laden des Films', error)
       );
@@ -34,12 +34,12 @@ export class AdminFilmFormComponent implements OnInit {
 
   speichereFilm(): void {
     if (this.filmId) {
-      this.kafkaService.sendRequest<void>('film.update', this.film).subscribe(
+      this.kafkaService.sendRequest<void>('filmUpdate', this.film).subscribe(
         () => this.router.navigate(['/admin/filme']),
         error => console.error('Fehler beim Aktualisieren des Films', error)
       );
     } else {
-      this.kafkaService.sendRequest<void>('film.create', this.film).subscribe(
+      this.kafkaService.sendRequest<void>('filmCreate', this.film).subscribe(
         () => this.router.navigate(['/admin/filme']),
         error => console.error('Fehler beim Erstellen des Films', error)
       );

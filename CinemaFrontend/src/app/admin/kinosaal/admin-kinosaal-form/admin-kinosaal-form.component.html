@@ -2,6 +2,7 @@
   <h2>Neuen Kinosaal erstellen</h2>
 
   <form (ngSubmit)="speichereKinosaal()">
+    <!-- Kinosaal Name -->
     <div class="form-group">
       <label for="name">Name des Kinosaals:</label>
       <input
@@ -14,6 +15,7 @@
       />
     </div>
 
+    <!-- Kinosaal Freigabe -->
     <div class="form-group">
       <label for="freigegeben">Freigegeben:</label>
       <input
@@ -25,11 +27,15 @@
       />
     </div>
 
+    <h4>Sitzreihen</h4>
+
     <!-- Sitzreihe hinzufügen -->
     <div class="form-group">
-      <label for="kategorie">Kategorie:</label>
+      <label for="kategorie">Kategorie der Sitzreihe:</label>
       <select id="kategorie" [(ngModel)]="ausgewaehlteKategorie" name="kategorie" class="form-control">
-        <option *ngFor="let kategorie of kategorieTypen" [ngValue]="kategorie">{{ kategorie }}</option>
+        <option *ngFor="let kategorie of kategorieTypen" [value]="kategorie.id">
+          {{ kategorie.name }} ({{ kategorie.preis | currency:'EUR' }})
+        </option>
       </select>
     </div>
 
@@ -42,31 +48,60 @@
         name="anzahlSitzplaetze"
         class="form-control"
         min="1"
-        placeholder="Anzahl der Sitzplätze"
+        placeholder="Anzahl der Sitzplätze pro Reihe"
       />
-      <button type="button" class="btn btn-success" (click)="hinzufuegenSitzreihe()">Hinzufügen</button>
+      <button type="button" class="btn btn-success mt-2" (click)="hinzufuegenSitzreihe()">Sitzreihe hinzufügen</button>
     </div>
 
     <!-- Sitzreihen Liste -->
-    <ul class="list-group mt-2">
+    <ul class="list-group mt-3">
       <li *ngFor="let reihe of sitzreihen; let i = index" class="list-group-item">
-        <div class="d-flex justify-content-between">
-          <span>Reihe {{ reihe.reihenNummer }} - Kategorie: {{ reihe.kategorieId }}</span>
+        <div class="d-flex justify-content-between align-items-center">
+          <span>Reihe {{ reihe.reihenNummer }} - {{ getKategorieName(reihe.kategorieId) }}</span>
           <button type="button" class="btn btn-danger btn-sm" (click)="entferneSitzreihe(i)">✖</button>
         </div>
 
         <!-- Sitzplatz-Anzeige -->
-        <div class="seat-layout">
+        <div class="seat-layout mt-2">
           <div class="row">
-            <div class="seat free" *ngFor="let _ of getSitzplaetzeAnzahl(reihe)"></div>
+            <div class="seat free" *ngFor="let sitzplatz of reihe.sitzplaetze">{{ sitzplatz.nummer }}</div>
           </div>
         </div>
       </li>
     </ul>
 
-    <button type="submit" class="btn btn-primary mt-3">Speichern</button>
-    <button type="button" class="btn btn-secondary mt-3" (click)="navigateToKinosaal()">
-      Abbrechen
-    </button>
+    <button type="submit" class="btn btn-primary mt-3">Kinosaal speichern</button>
+    <button type="button" class="btn btn-secondary mt-3" (click)="navigateToKinosaal()">Abbrechen</button>
   </form>
 </div>
+
+<!-- Sitzplatz-Styles -->
+<style>
+  .seat-layout {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  
+  .seat {
+    width: 30px;
+    height: 30px;
+    background-color: lightgray;
+    border: 1px solid black;
+    border-radius: 5px;
+    text-align: center;
+    line-height: 30px;
+  }
+
+  .seat.free {
+    background-color: green;
+  }
+
+  .seat.reserved {
+    background-color: orange;
+  }
+
+  .seat.booked {
+    background-color: red;
+  }
+</style>

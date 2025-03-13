@@ -1,9 +1,8 @@
-import { KategorieTyp } from './sitzkategorie.model';
+import { Sitzplatz } from "./sitzplatz.model";
 
 export interface Sitzreihe {
   id: number;
   reihenNummer: number;
-  kategorieId: KategorieTyp | number;  // Akzeptiert `KategorieTyp` & `number`
-  sitzplatzIds: number[];  // Liste der Sitzplätze in dieser Reihe
-  kinosaalId: number; // Zugehöriger Kinosaal
+  kategorieId: number;  // Referenz zur Kategorie-ID
+  sitzplaetze: Sitzplatz[];  // Enthält die Sitzplätze direkt
 }
